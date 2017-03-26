@@ -1,38 +1,48 @@
 import com.hpe.Feature;
-import com.hpe.JC;
-import com.hpe.Scenario;
-import com.hpe.JCRunner;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Created by koreny on 3/20/2017.
  */
 
-@Feature("./gherkin.feature")
-@RunWith(JCRunner.class)
 public class MyTestsTest {
 
+    public static Feature log = new Feature(MyTestsTest.class, "c:\\gherkin.feature",
+            "hello world");
+
     @Test
-    @Scenario("As a user I want to run a junit test in Gherkin style")
     public void myTest() {
-        JC.Given("this actually works");
+        log.scenario("This is the first scenario", ()->{
+            log.given( "I have a scenario");
 
-        JC.When("I run this thing");
+            log.when("I run my junt test");
 
-        JC.Then("I want to see a report");
+            //log.then("I can do this");
+        });
     }
 
     @Test
-    @Scenario("As a user I want to run another scenario in the same feature file")
     public void myTest2() {
-        JC.Given("this actually works twice");
+        log.scenario("this is the second scenario", ()-> {
 
-        JC.When("I run this thing again");
+            log.given("another try");
 
-        JC.Then("Ill really get crazy");
-        Assert.assertEquals(1,2);
+            log.when("I do something");
+
+            log.then("it happens");
+
+            //log.and("bla!");
+            Assert.assertEquals(1,2);
+
+        });
+    }
+
+    @AfterClass
+    public static void closeLog() {
+        log.finished();
     }
 
 }
+
