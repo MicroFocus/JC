@@ -1,5 +1,7 @@
 package com.hpe;
 
+import java.util.ArrayList;
+
 /**
  * Created by koreny on 3/25/2017.
  */
@@ -14,7 +16,7 @@ public class GherkinAssert {
     public void SameFeature(GherkinFeature actual, GherkinFeature expected) {
         if (notTheSame(actual.description, expected.description)) {
             String message = String.format("" +
-                    "feature description is not the same the feature definition file specified. \n" +
+                    "feature description is not the same as the feature definition file specified. \n" +
                     "Your feature: \"%s\" \n" +
                     "Defined feature: \"%s\" \n", actual.description, expected.description);
             throw createException(message);
@@ -46,8 +48,8 @@ public class GherkinAssert {
                             "your scenario should be: \n\n%s\n" +
                             "But it looks like that: \n\n%s\n",
                     String.valueOf(dif),
-                    printScenario(linkToScenarioDefinition, "MISSING STEPS"),
-                    printScenario(currentScenario));
+                    linkToScenarioDefinition.printScenario(),
+                    currentScenario.clone(new GherkinStep("X", "")).printScenario("MISSING STEPS"));
 
             throw createException(message);
         }
@@ -68,9 +70,9 @@ public class GherkinAssert {
             String message = String.format(
                     "Your scenario description does not match any of the scenarios on the feature file\n" +
                     "This is your scenario: \n%s\n\n" +
-                    "These are all the scenarios found in the feature file:\n\n", printScenarioTitle(actualScenario));
+                    "These are all the scenarios found in the feature file:\n\n", actualScenario.printScenarioTitle());
             for (GherkinScenario scenario : featureDefinition.scenarios) {
-                message += printScenarioTitle(scenario) + "\n";
+                message += scenario.printScenarioTitle() + "\n";
             }
             throw createException(message);
         }
@@ -96,8 +98,8 @@ public class GherkinAssert {
                     "You seems to have an extra step that is not found on the feature file: \n" +
                             "your scenario should be: \n\n%s\n" +
                             "But it looks like that: \n\n%s\n",
-                    printScenario(progress.getExpectedScenario()),
-                    printScenario(progress.getCurrentScenario().clone(nextStep), "EXTRA STEP"));
+                    progress.getScenarioDefinition().printScenario(),
+                    progress.getCurrentScenario().clone(nextStep).printScenario(), "EXTRA STEP");
             throw createException(message);
         }
     }
@@ -108,8 +110,8 @@ public class GherkinAssert {
                     "The type of the step is not identical to the expected type: \n" +
                     "your scenario should be: \n\n%s\n" +
                     "But it looks like that: \n\n%s\n",
-                    printScenario(progress.getExpectedScenario()),
-                    printScenario(progress.getCurrentScenario(), "WRONG STEP TYPE"));
+                    progress.getScenarioDefinition().printScenario(),
+                    progress.getCurrentScenario().printScenario(), "WRONG STEP TYPE");
             throw createException(message);
         }
 
@@ -118,41 +120,21 @@ public class GherkinAssert {
                     "The description of the step is not identical to the expected description: \n" +
                     "your scenario should be: \n\n%s\n" +
                     "But it looks like that: \n\n%s\n",
-                    printScenario(progress.getExpectedScenario()),
-                    printScenario(progress.getCurrentScenario(), "WRONG DESCRIPTION"));
+                    progress.getScenarioDefinition().printScenario(),
+                    progress.getCurrentScenario().clone(nextStep).printScenario(), "WRONG DESCRIPTION");
             throw createException(message);
         }
     }
 
-    private String printScenario(GherkinScenario scenario) {
-        return printScenario(scenario, "");
-    }
 
-    private String printScenario(GherkinScenario scenario, String arrowText) {
-        String result = printScenarioTitle(scenario);
-        int stepsNum = scenario.steps.size();
+    public static JCException createClearExceptionFrom(Throwable orig, GherkinProgress progress) {
+        String ex =
+                "Flow of events:\n" +
+                progress.getCurrentScenario().printScenario() +
+                "<<<< BOOM >>>>\n" +
+                orig.getMessage();
 
-        result+="\n";
-        for (int i = 0; i<stepsNum - 1; i++) {
-            result += printStep(scenario.steps.get(i));
-            result += "\n";
-        }
-        if (stepsNum>0) {
-           result += printStep(scenario.steps.get(stepsNum-1));
-           if (!arrowText.isEmpty()) {
-               result += String.format("   <================= %s", arrowText);
-           }
-           result += "\n";
-        }
-        return result;
-    }
-
-    private String printScenarioTitle(GherkinScenario scenario) {
-        return String.format("|  Scenario: %s", scenario.description);
-    }
-
-    private String printStep(GherkinStep step) {
-        return String.format("|    %s %s", step.type, step.description);
+        throw new JCException(ex, orig);
     }
 
     private boolean notTheSame(String str1, String str2) {
@@ -171,4 +153,47 @@ public class GherkinAssert {
         return new GherkinException();
     }
 
+    public void sameNumberOfScenarios() {
+        // no feature definition -> nothing to compare to...
+        if (progress.getFeatureDefinition()==null) {
+            return;
+        }
+
+        // forgot to implement some scenarios from within the feature definition
+
+        // let's fill this with forgotten scenarios...
+        ArrayList<GherkinScenario> scenariosToImplement = new ArrayList<>();
+
+        int scenarioDif = progress.getFeatureDefinition().scenarios.size() - progress.getCurrentFeature().scenarios.size();
+        if (scenarioDif > 0) {
+            String message = String.format("You forgot to implement %s scenarios:\n", String.valueOf(scenarioDif));
+            for (GherkinScenario scenarioDef : progress.getFeatureDefinition().scenarios) {
+                boolean isFeatureImplemented = false;
+                for (GherkinScenario actualScenario : progress.getCurrentFeature().scenarios) {
+                    if (actualScenario.getLinktoScenarioDef().equals(scenarioDef)) {
+                        isFeatureImplemented = true;
+                        break;
+                    }
+                }
+
+                if (!isFeatureImplemented) {
+                    scenariosToImplement.add(scenarioDef);
+                }
+            }
+
+            for (GherkinScenario scenario : scenariosToImplement) {
+                message+= scenario.printScenario();
+                message+="\n";
+            }
+
+            message += "\nimplement missing scenarios using below code:\n\n";
+
+            for (GherkinScenario scenario : scenariosToImplement) {
+                message+= scenario.printScenarioCode();
+                message+="\n\n";
+            }
+
+            throw createException(message);
+        }
+    }
 }

@@ -5,7 +5,6 @@ package com.hpe;
  */
 public class GherkinProgress {
 
-
     public GherkinProgress(Object test) {
         this.test = test;
         check = new GherkinAssert(this);
@@ -41,11 +40,13 @@ public class GherkinProgress {
      * Public methods
      *************************************/
 
+    public GherkinFeature getCurrentFeature() { return currentFeature; }
+
     public GherkinScenario getCurrentScenario() {
         return currentScenario;
     }
 
-    public GherkinScenario getExpectedScenario() {
+    public GherkinScenario getScenarioDefinition() {
         return linkToScenarioDefinition;
     }
 
@@ -53,9 +54,12 @@ public class GherkinProgress {
         return currentScenario.exception!=null;
     }
 
-    public void setFeatureData(GherkinFeature feature) {
+    public void setFeatureDefinition(GherkinFeature feature) {
+        featureDefinition = feature;
+    }
 
-        this.featureDefinition = feature;
+    public GherkinFeature getFeatureDefinition() {
+        return featureDefinition;
     }
 
     /*************************************
@@ -63,8 +67,15 @@ public class GherkinProgress {
      *************************************/
 
     public void updateFeature(GherkinFeature actualFeature) {
-        currentFeature = actualFeature;
-        check.SameFeature(featureDefinition, currentFeature);
+            // end of feature
+        if (actualFeature == null) {
+            check.sameNumberOfScenarios();
+
+        } else {
+            // start of feature
+            currentFeature = actualFeature;
+            check.SameFeature(featureDefinition, currentFeature);
+        }
     }
 
     public void updateScenario(GherkinScenario actualScenario) {
@@ -87,10 +98,11 @@ public class GherkinProgress {
         }
 
         // signal start of new scenario
-        // currentScenario might not be null if previous scenario through an exception
+        // currentScenario might not be null if previous scenario throw an exception
         if (actualScenario != null) {
             if (isFeatureFileDefined()) {
                 linkToScenarioDefinition = check.featureContainsScenario(featureDefinition, actualScenario);
+                actualScenario.setLinktoScenarioDef(linkToScenarioDefinition);
                 linkToStepDefinition = null;
             }
             currentScenario = actualScenario;
@@ -128,5 +140,8 @@ public class GherkinProgress {
 
     public void report() {
 
+
     }
+
+
 }
