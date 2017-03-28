@@ -1,11 +1,12 @@
 # JC
-Cucumber Library for UI Automation
+## Cucumber Library for UI Automation
 
-Project is still under construction...
+**Project is still under construction...**
 
 JC is a light weight library for writing cucumber tests without the borden of changing your test structure.
 You write your tests in plain junit, and use JC to describe your scenarios / steps like this:
 
+```java
 // your typical JUnit class
 public class MyCucumberTest {
 
@@ -49,8 +50,9 @@ public class MyCucumberTest {
         jc.finished();
     }
 }
+```
 
-##You get the following benefits:
+## You get the following benefits:
 - A test that is easy to read and understand
 
 - Turn your tests into BDD without changing their entire structure
