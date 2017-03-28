@@ -2,11 +2,8 @@
  * Created by koreny on 3/20/2017.
  */
 import com.hpe.*;
-import gherkin.formatter.JSONFormatter;
-import gherkin.formatter.PrettyFormatter;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
-import gherkin.parser.Parser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -20,7 +17,7 @@ public class JCTests {
     public void TestGherkinParser() {
         GherkinLexerListener listener = new GherkinLexerListener();
         Lexer lexer = new En(listener);
-        lexer.scan("Feature: hello \n" +
+        lexer.scan("JC: hello \n" +
                 " Scenario: world \n" +
                 " Given I do \n" +
                 " Then I will");
@@ -39,7 +36,7 @@ public class JCTests {
     }
 
 
-    Feature runit(final Class className) {
+    JC runit(final Class className) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

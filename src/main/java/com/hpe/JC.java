@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Feature {
+public class JC {
 
     /*********************************
      * Private properties
@@ -48,18 +48,18 @@ public class Feature {
 
 
     /*********************************
-     * Constructors methods - Feature definitions
+     * Constructors methods - JC definitions
      *********************************/
 
     // Using this constructor will compare between feature file and actual scenarios and steps
-    public Feature(Object test, String featureFileLocation, String featureDescription) {
+    public JC(Object test, String featureFileLocation, String featureDescription) {
 
         progress = new GherkinProgress(test);
 
         // load and parse gherkin script
         String gherkinScript = readGherkinScript(featureFileLocation);
         GherkinFeature feature = parseGherkinScript(gherkinScript);
-        progress.setFeatureData(feature);
+        progress.setFeatureDefinition(feature);
 
         // update the progress with the feature
         GherkinFeature actualFeature = new GherkinFeature(featureDescription);
@@ -68,7 +68,7 @@ public class Feature {
 
 
     // Using this constructor will only create a report of what happened
-    public Feature(Object test, String featureDescription) {
+    public JC(Object test, String featureDescription) {
 
         progress = new GherkinProgress(test);
 
@@ -92,9 +92,12 @@ public class Feature {
         // handle running the scenario
         try {
             code.run();
-        } catch (Exception | Error e) {
+        } catch (GherkinException e) {
             progress.updateException(e);
             throw e;
+        } catch (Exception | Error e) {
+            progress.updateException(e);
+            throw GherkinAssert.createClearExceptionFrom(e, progress);
         } finally {
             // update only if everything is ok
             if (!progress.isCurrentScenarioHasException()) {
@@ -105,6 +108,7 @@ public class Feature {
     }
 
     // todo - handle parameters (in scenario too), running it several times
+    /*
     public void scenarioOutline(String description, Runnable code) {
         try {
             code.run();
@@ -121,33 +125,33 @@ public class Feature {
             throw e;
         }
     }
-
+    */
     public void given(String stepDesc) {
-        GherkinStep step = new GherkinStep("given", stepDesc);
+        GherkinStep step = new GherkinStep("Given", stepDesc);
         progress.updateStep(step);
     }
 
     public void when(String stepDesc) {
-        GherkinStep step = new GherkinStep("when", stepDesc);
+        GherkinStep step = new GherkinStep("When", stepDesc);
         progress.updateStep(step);
     }
 
     public void then(String stepDesc) {
-        GherkinStep step = new GherkinStep("then", stepDesc);
+        GherkinStep step = new GherkinStep("Then", stepDesc);
         progress.updateStep(step);
     }
 
     public void and(String stepDesc) {
-        GherkinStep step = new GherkinStep("and", stepDesc);
+        GherkinStep step = new GherkinStep("And", stepDesc);
         progress.updateStep(step);
     }
 
     public void but(String stepDesc) {
-        GherkinStep step = new GherkinStep("but", stepDesc);
+        GherkinStep step = new GherkinStep("But", stepDesc);
         progress.updateStep(step);
     }
 
     public void finished() {
-        int a = 6;
+        progress.updateFeature(null);
     }
 }

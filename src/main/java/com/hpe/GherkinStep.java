@@ -12,4 +12,10 @@ public class GherkinStep {
         this.type = type;
         this.description = description;
     }
+
+
+    public String printStep() {
+        return String.format("|    %s %s", type.trim(), description.trim());
+    }
+
 }
