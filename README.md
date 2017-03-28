@@ -1,5 +1,4 @@
-# JC
-## Cucumber Library for UI Automation
+# JC - Cucumber Library for UI Automation
 
 **Project is still under construction...**
 
@@ -13,7 +12,7 @@ public class MyCucumberTest {
     // just add JC to your class
     public static JC jc = new JC(
             MyCucumberTest.class, 
-            ".\gherkin.feature", // link to youe feature file 
+            ".\gherkin.feature", // link to your feature file 
             "This is your feature file title");
 
 
