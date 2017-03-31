@@ -14,7 +14,7 @@ public class JCException extends Error {
     }
 
     public JCException(String message, Throwable orig) {
-        super(message + orig.getMessage());
+        super(message, orig);
 
         this.setStackTrace(orig.getStackTrace());
 
