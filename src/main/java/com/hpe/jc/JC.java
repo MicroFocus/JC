@@ -2,14 +2,15 @@
  * Created by koreny on 3/20/2017.
  */
 
-package com.hpe;
+package com.hpe.jc;
 
-import gherkin.lexer.En;
-import gherkin.lexer.Lexer;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import com.hpe.jc.errors.GherkinAssert;
+import com.hpe.jc.gherkin.GherkinFeature;
+import com.hpe.jc.gherkin.GherkinProgress;
+import com.hpe.jc.gherkin.GherkinScenario;
+import com.hpe.jc.gherkin.GherkinStep;
+import com.hpe.jc.plugins.JCCannotContinueException;
+import com.hpe.jc.plugins.JCPlugin;
 
 public class JC {
 
@@ -71,9 +72,9 @@ public class JC {
             throw GherkinAssert.createClearExceptionFrom(e, progress);
         } finally {
             // update only if everything is ok
-            if (!progress.isCurrentScenarioHasException()) {
+            //if (!progress.isCurrentScenarioHasException()) {
                 progress.updateScenario(null);
-            }
+            //}
             progress.report();
         }
     }

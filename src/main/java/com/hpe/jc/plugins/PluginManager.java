@@ -1,4 +1,7 @@
-package com.hpe;
+package com.hpe.jc.plugins;
+
+import com.hpe.jc.gherkin.GherkinProgress;
+import com.hpe.jc.gherkin.IJCExceptionHolder;
 
 import java.util.ArrayList;
 

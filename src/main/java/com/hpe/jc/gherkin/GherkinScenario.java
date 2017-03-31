@@ -1,4 +1,4 @@
-package com.hpe;
+package com.hpe.jc.gherkin;
 
 import java.util.ArrayList;
 
