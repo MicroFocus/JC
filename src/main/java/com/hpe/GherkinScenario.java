@@ -5,15 +5,13 @@ import java.util.ArrayList;
 /**
  * Created by koreny on 3/20/2017.
  */
-public class GherkinScenario {
+public class GherkinScenario extends GherkinBaseEntity{
 
-    public Throwable exception;
     public ArrayList<GherkinStep> steps = new ArrayList<GherkinStep>();
-    public String description;
-    private GherkinScenario linktoScenarioDef;
 
     public GherkinScenario(String description) {
-        this.description = description;
+
+        super(description);
     }
 
     public GherkinStep getNextStep(GherkinStep step) {
@@ -44,16 +42,15 @@ public class GherkinScenario {
     }
 
     public GherkinScenario clone(GherkinStep extraStep) {
-        GherkinScenario clone = new GherkinScenario(description);
+        GherkinScenario clone = new GherkinScenario(getDescription());
         clone.steps = (ArrayList<GherkinStep>) steps.clone();
         clone.steps.add(extraStep);
 
         return clone;
     }
 
-
     public String printScenarioTitle() {
-        return String.format("|  Scenario: %s", description);
+        return String.format("|  Scenario: %s", getDescription());
     }
 
     public String printScenario() {
@@ -84,10 +81,10 @@ public class GherkinScenario {
         String code = String.format(
                 "\t@Test\n" +
                 "\tpublic void %s() {\n"+
-                "\t\tjc.scenario(\"%s\", ()->{\n", toCamelCase(description), description);
+                "\t\tjc.scenario(\"%s\", ()->{\n", toCamelCase(getDescription()), getDescription());
         for (GherkinStep step : steps) {
             code+= String.format(
-                "\t\t\tjc.%s(\"%s\");\n", step.type.toLowerCase(), step.description);
+                "\t\t\tjc.%s(\"%s\");\n", step.type.toLowerCase(), step.getDescription());
         }
         code += String.format(
                 "\t\t});\n" +
@@ -104,11 +101,4 @@ public class GherkinScenario {
         return result.substring(0,1).toLowerCase() + result.substring(1);
     }
 
-    public GherkinScenario getLinktoScenarioDef() {
-        return linktoScenarioDef;
-    }
-
-    public void setLinktoScenarioDef(GherkinScenario linktoScenarioDef) {
-        this.linktoScenarioDef = linktoScenarioDef;
-    }
 }

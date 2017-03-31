@@ -1,5 +1,7 @@
 package com.hpe;
 
+import java.util.ArrayList;
+
 /**
  * Created by koreny on 3/21/2017.
  */
@@ -7,34 +9,26 @@ public class GherkinProgress {
 
     public GherkinProgress(Object test) {
         this.test = test;
-        check = new GherkinAssert(this);
     }
 
-    // utility to check and compare gherkin related stuff, and created sophisticated exceptions
-    private GherkinAssert check;
+    public GherkinProgress(Object test, JCPlugin[] plugins) {
+        this(test);
+
+        for (JCPlugin plugin : plugins) {
+            pluginManager.registerPlugin(plugin);
+        }
+    }
 
     // save tested class (for possibly reporting the name of the class only, no real need of it)
     private Object test;
 
-    // contains the feature file data (taken from the @feature annotation)
-    private GherkinFeature featureDefinition;
-
-    // used to link to expected scenario and step from feature definition. Updated in start of scenario / step.
-    private GherkinScenario linkToScenarioDefinition;
-    private GherkinStep linkToStepDefinition;
-
-    // track actual feature
+    // track current feature/scenario/step
     private GherkinFeature currentFeature;
     private GherkinScenario currentScenario;
     private GherkinStep currentStep;
 
-    /*************************************
-     * Private methods
-     *************************************/
-
-    private boolean isFeatureFileDefined() {
-        return featureDefinition != null;
-    }
+    // execute the plugins. Funny that it is a plugin itself...
+    private PluginManager pluginManager = new PluginManager();
 
     /*************************************
      * Public methods
@@ -46,20 +40,10 @@ public class GherkinProgress {
         return currentScenario;
     }
 
-    public GherkinScenario getScenarioDefinition() {
-        return linkToScenarioDefinition;
-    }
+    public GherkinStep getCurrentStep() { return currentStep; }
 
     public boolean isCurrentScenarioHasException() {
-        return currentScenario.exception!=null;
-    }
-
-    public void setFeatureDefinition(GherkinFeature feature) {
-        featureDefinition = feature;
-    }
-
-    public GherkinFeature getFeatureDefinition() {
-        return featureDefinition;
+        return currentScenario.getTestExceptions().size()>0;
     }
 
     /*************************************
@@ -69,12 +53,14 @@ public class GherkinProgress {
     public void updateFeature(GherkinFeature actualFeature) {
             // end of feature
         if (actualFeature == null) {
-            check.sameNumberOfScenarios();
+            pluginManager.onFeatureEnd(this);
+            currentFeature = actualFeature;
 
         } else {
             // start of feature
             currentFeature = actualFeature;
-            check.SameFeature(featureDefinition, currentFeature);
+            pluginManager.onFeatureStart(this);
+
         }
     }
 
@@ -86,60 +72,49 @@ public class GherkinProgress {
         }
 
         // signal the end of current scenario
-        if (actualScenario == null && currentScenario != null) {
+        if (actualScenario == null) {
+            // end last step if there is one
+            if (currentStep!=null) {
+                pluginManager.onStepEnd(this);
+                currentStep = null;
+            }
+            pluginManager.onScenarioEnd(this);
             // if feature definition exists -> check # of steps
-            if (isFeatureFileDefined()) {
-                check.linkToScenarioInFeatureDefinitionIsValid(linkToScenarioDefinition, featureDefinition);
-                check.ScenarioHasAllSteps(linkToScenarioDefinition, currentScenario);
-            }
-            linkToScenarioDefinition = null;
             currentScenario = null;
-            return;
-        }
 
-        // signal start of new scenario
-        // currentScenario might not be null if previous scenario throw an exception
-        if (actualScenario != null) {
-            if (isFeatureFileDefined()) {
-                linkToScenarioDefinition = check.featureContainsScenario(featureDefinition, actualScenario);
-                actualScenario.setLinktoScenarioDef(linkToScenarioDefinition);
-                linkToStepDefinition = null;
-            }
+        } else {
+
+            // signal start of new scenario
+            // currentScenario might not be null if previous scenario throw an exception
             currentScenario = actualScenario;
-            currentFeature.scenarios.add(actualScenario);
-            return;
+            pluginManager.onScenarioStart(this);
+            currentFeature.scenarios.add(currentScenario);
         }
     }
 
     public void updateStep(GherkinStep nextStep) {
-        check.currentScenarioIsValid(currentScenario);
-        check.linkToScenarioInFeatureDefinitionIsValid(linkToScenarioDefinition, featureDefinition);
-
-        if (isFeatureFileDefined()) {
-            GherkinStep expectedNextStep = linkToScenarioDefinition.getNextStep(linkToStepDefinition);
-            check.validExpectedNextStep(linkToScenarioDefinition, nextStep, expectedNextStep);
-            check.nextStepIsAsExpected(linkToScenarioDefinition, expectedNextStep, currentScenario, nextStep);
-
-            // update link if everything is ok
-            linkToStepDefinition = expectedNextStep;
+        // not first step in the scenario -> let's close the previous step
+        if (currentStep != null) {
+            pluginManager.onStepEnd(this);
         }
-
         currentStep = nextStep;
-        currentScenario.steps.add(nextStep);
+        pluginManager.onStepStart(this);
+        currentScenario.steps.add(currentStep);
+        GherkinAssert.currentScenarioIsValid(currentScenario);
     }
 
-    public void updateException(Throwable e) {
+    public void updateException(Throwable ex) {
+        pluginManager.onStepFailure(this, ex);
         if (currentStep != null) {
-            currentStep.exception = e;
+            currentStep.addTestException(ex);
         }
 
         if (currentScenario != null) {
-            currentScenario.exception = e;
+            currentScenario.addTestException(ex);
         }
     }
 
     public void report() {
-
 
     }
 

@@ -1,4 +1,6 @@
 import com.hpe.JC;
+import com.hpe.JCPFeatureFileVsActualValidator;
+import com.hpe.JCPlugin;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,15 +9,21 @@ import org.junit.Test;
  * Created by koreny on 3/20/2017.
  */
 
+
 public class MyTestsTest {
 
-    public static JC jc = new JC(MyTestsTest.class, "c:\\gherkin.feature",
+    //TODO: support annotations for plugins and feature description
+    //TODO: add init method to plugin + init with progress + remove progress signature from all plugins
+    //TODO: add plugin dependency so that Octane plugin can demand syntax validator plugin and extract info from it.
+    public static JC jc = new JC(
+            MyTestsTest.class,
+            new JCPlugin[]{new JCPFeatureFileVsActualValidator("c:\\gherkin.feature")},
             "hello world");
 
 
     @Test
     public void myTest() {
-/*        jc.scenario("This is the first scenario", ()->{
+        jc.scenario("This is the first scenario", ()->{
 
             jc.given( "I have a scenario");
 
@@ -26,18 +34,8 @@ public class MyTestsTest {
     }
 
     @Test
-    public void thisIsTheSecondScenario() {
-        jc.scenario("this is the second scenario", ()->{
-            jc.given ("another try");
-            jc.when ("I do something");
-            jc.then ("it happens");
-        });*/
-    }
-
-    /*
-    @Test
     public void myTest2() {
-        jc.scenario("this is the second <p1> scenario", ()-> {
+        jc.scenario("this is the second2 scenario", ()-> {
 
             jc.given("another try");
 
@@ -51,7 +49,7 @@ public class MyTestsTest {
         });
 
     }
-*/
+
     @AfterClass
     public static void closeLog() {
         jc.finished();
