@@ -1,5 +1,10 @@
-package com.hpe;
+package com.hpe.jc.plugins;
 
+import com.hpe.jc.errors.GherkinAssert;
+import com.hpe.jc.gherkin.GherkinFeature;
+import com.hpe.jc.gherkin.GherkinProgress;
+import com.hpe.jc.gherkin.GherkinScenario;
+import com.hpe.jc.gherkin.GherkinStep;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
 
@@ -7,12 +12,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by koreny on 3/31/2017.
  */
-public class JCPFeatureFileVsActualValidator extends JCPlugin {
+public class JCPValidateFlowBy extends JCPlugin {
 
     // contains the feature file data (taken from the @feature annotation)
     private GherkinFeature featureFile;
@@ -23,7 +27,7 @@ public class JCPFeatureFileVsActualValidator extends JCPlugin {
 
     HashMap<GherkinScenario, GherkinScenario> file2actual = new HashMap<GherkinScenario, GherkinScenario>();
 
-    public JCPFeatureFileVsActualValidator(String featureFileLocation) {
+    public JCPValidateFlowBy(String featureFileLocation) {
 
         // load and parse gherkin script
         String gherkinScript = readGherkinScript(featureFileLocation);

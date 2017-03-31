@@ -1,4 +1,4 @@
-package com.hpe;
+package com.hpe.jc.errors;
 
 /**
  * Created by koreny on 3/26/2017.

@@ -1,4 +1,4 @@
-package com.hpe;
+package com.hpe.jc.plugins;
 
 /**
  * Created by koreny on 3/25/2017.

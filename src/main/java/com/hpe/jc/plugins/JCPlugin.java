@@ -1,4 +1,6 @@
-package com.hpe;
+package com.hpe.jc.plugins;
+
+import com.hpe.jc.gherkin.GherkinProgress;
 
 /**
  * Created by koreny on 3/29/2017.

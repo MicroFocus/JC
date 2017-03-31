@@ -1,6 +1,6 @@
-import com.hpe.JC;
-import com.hpe.JCPFeatureFileVsActualValidator;
-import com.hpe.JCPlugin;
+import com.hpe.jc.JC;
+import com.hpe.jc.plugins.JCPValidateFlowBy;
+import com.hpe.jc.plugins.JCPlugin;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class MyTestsTest {
     //TODO: add plugin dependency so that Octane plugin can demand syntax validator plugin and extract info from it.
     public static JC jc = new JC(
             MyTestsTest.class,
-            new JCPlugin[]{new JCPFeatureFileVsActualValidator("c:\\gherkin.feature")},
+            new JCPlugin[]{new JCPValidateFlowBy("c:\\gherkin.feature")},
             "hello world");
 
 

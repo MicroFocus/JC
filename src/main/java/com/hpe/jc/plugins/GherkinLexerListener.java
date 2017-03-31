@@ -1,5 +1,8 @@
-package com.hpe;
+package com.hpe.jc.plugins;
 
+import com.hpe.jc.gherkin.GherkinFeature;
+import com.hpe.jc.gherkin.GherkinScenario;
+import com.hpe.jc.gherkin.GherkinStep;
 import gherkin.lexer.Listener;
 import java.util.List;
 

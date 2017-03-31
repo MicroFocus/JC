@@ -1,6 +1,8 @@
-package com.hpe;
+package com.hpe.jc.gherkin;
 
-import java.util.ArrayList;
+import com.hpe.jc.errors.GherkinAssert;
+import com.hpe.jc.plugins.JCPlugin;
+import com.hpe.jc.plugins.PluginManager;
 
 /**
  * Created by koreny on 3/21/2017.
@@ -97,10 +99,13 @@ public class GherkinProgress {
         if (currentStep != null) {
             pluginManager.onStepEnd(this);
         }
-        currentStep = nextStep;
-        pluginManager.onStepStart(this);
-        currentScenario.steps.add(currentStep);
-        GherkinAssert.currentScenarioIsValid(currentScenario);
+        // this is null when exception is thrown in step and need to end it without open another one...
+        if (nextStep != null) {
+            currentStep = nextStep;
+            pluginManager.onStepStart(this);
+            currentScenario.steps.add(currentStep);
+            GherkinAssert.currentScenarioIsValid(currentScenario);
+        }
     }
 
     public void updateException(Throwable ex) {

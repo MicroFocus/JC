@@ -1,4 +1,4 @@
-package com.hpe;
+package com.hpe.jc.gherkin;
 
 /**
  * Created by koreny on 3/30/2017.

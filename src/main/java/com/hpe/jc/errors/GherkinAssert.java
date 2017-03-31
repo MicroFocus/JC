@@ -1,4 +1,10 @@
-package com.hpe;
+package com.hpe.jc.errors;
+
+import com.hpe.jc.gherkin.GherkinFeature;
+import com.hpe.jc.gherkin.GherkinProgress;
+import com.hpe.jc.gherkin.GherkinScenario;
+import com.hpe.jc.gherkin.GherkinStep;
+import com.hpe.jc.plugins.JCCannotContinueException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
