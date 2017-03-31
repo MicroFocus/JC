@@ -9,6 +9,7 @@ import gherkin.lexer.Lexer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class JC {
 
@@ -23,47 +24,17 @@ public class JC {
 
 
     /*********************************
-     * Private methods
-     *********************************/
-
-    private static String readGherkinScript(String scriptPath) {
-
-        String content = "";
-        try {
-            content = new String(Files.readAllBytes(Paths.get(scriptPath)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return content;
-    }
-
-    private static GherkinFeature parseGherkinScript(String script) {
-        GherkinLexerListener listener = new GherkinLexerListener();
-        Lexer lexer = new En(listener);
-        lexer.scan(script);
-
-        return listener.currentFeature;
-    }
-
-
-    /*********************************
      * Constructors methods - JC definitions
      *********************************/
 
     // Using this constructor will compare between feature file and actual scenarios and steps
-    public JC(Object test, String featureFileLocation, String featureDescription) {
+    public JC(Object test, JCPlugin[] plugins, String featureDescription) {
 
-        progress = new GherkinProgress(test);
-
-        // load and parse gherkin script
-        String gherkinScript = readGherkinScript(featureFileLocation);
-        GherkinFeature feature = parseGherkinScript(gherkinScript);
-        progress.setFeatureDefinition(feature);
+        progress = new GherkinProgress(test, plugins);
 
         // update the progress with the feature
-        GherkinFeature actualFeature = new GherkinFeature(featureDescription);
-        progress.updateFeature(actualFeature);
+        GherkinFeature feature = new GherkinFeature(featureDescription);
+        progress.updateFeature(feature);
     }
 
 
@@ -92,7 +63,7 @@ public class JC {
         // handle running the scenario
         try {
             code.run();
-        } catch (GherkinException e) {
+        } catch (JCCannotContinueException e) {
             progress.updateException(e);
             throw e;
         } catch (Exception | Error e) {

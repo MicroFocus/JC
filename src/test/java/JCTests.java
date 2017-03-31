@@ -21,11 +21,11 @@ public class JCTests {
                 " Scenario: world \n" +
                 " Given I do \n" +
                 " Then I will");
-        Assert.assertEquals(listener.currentFeature.description, "hello");
-        Assert.assertEquals(listener.currentFeature.scenarios.get(0).description, "world");
-        Assert.assertEquals(listener.currentFeature.scenarios.get(0).steps.get(0).description, "I do");
+        Assert.assertEquals(listener.currentFeature.getDescription(), "hello");
+        Assert.assertEquals(listener.currentFeature.scenarios.get(0).getDescription(), "world");
+        Assert.assertEquals(listener.currentFeature.scenarios.get(0).steps.get(0).getDescription(), "I do");
         Assert.assertEquals(listener.currentFeature.scenarios.get(0).steps.get(0).type, "given");
-        Assert.assertEquals(listener.currentFeature.scenarios.get(0).steps.get(1).description, "I will");
+        Assert.assertEquals(listener.currentFeature.scenarios.get(0).steps.get(1).getDescription(), "I will");
         Assert.assertEquals(listener.currentFeature.scenarios.get(0).steps.get(1).type, "then");
     }
 
