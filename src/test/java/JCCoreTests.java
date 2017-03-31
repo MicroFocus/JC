@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-public class JCTests {
+public class JCCoreTests {
 
     @Test
     public void TestBasicFlow() {

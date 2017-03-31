@@ -14,45 +14,39 @@ import java.util.HashMap;
  */
 public class GherkinAssert {
 
+    public enum ERROR_TYPES {
+        FEATURES_MISMATCH,
+        SCENARIO_TOO_FEW,
+        SCENARIO_MISMATCH,
+        SCENARIO_NULL,
+        STEP_TOO_MANY,
+        STEP_TOO_FEW,
+        STEP_MISMATCH
+    }
+
     public static void SameFeature(GherkinFeature actual, GherkinFeature expected) {
         if (notTheSame(actual.getDescription(), expected.getDescription())) {
             String message = String.format("" +
                     "feature description is not the same as the feature definition file specified. \n" +
                     "Your feature: \"%s\" \n" +
                     "Defined feature: \"%s\" \n", actual.getDescription(), expected.getDescription());
-            throw createException(message);
+            throw createException(message, ERROR_TYPES.FEATURES_MISMATCH);
         }
     }
 
-    public static void SameScenario(GherkinScenario actual, GherkinScenario expected) {
-        if (notTheSame(actual.getDescription(), expected.getDescription())) {
-            throw createException();
-        }
-    }
-
-    public static void SameStep(GherkinStep actual, GherkinStep expected) {
-        if (notTheSame(actual.type, expected.type)) {
-            throw createException();
-        }
-
-        if (notTheSame(actual.getDescription(), expected.getDescription())) {
-            throw createException();
-        }
-
-    }
 
     public static void ScenarioHasAllSteps(GherkinScenario linkToScenarioDefinition, GherkinScenario currentScenario) {
         int dif = linkToScenarioDefinition.steps.size() - currentScenario.steps.size();
         if (dif != 0) {
             String message = String.format(
-                    "You seems to have missing %s steps that are found on the feature file: \n" +
+                    "You seems to have missing %s steps that are found on the scenario: \n" +
                             "your scenario should be: \n\n%s\n" +
                             "But it looks like that: \n\n%s\n",
                     String.valueOf(dif),
                     linkToScenarioDefinition.printScenario(),
                     currentScenario.clone(new GherkinStep("X", "")).printScenario("MISSING STEPS"));
 
-            throw createException(message);
+            throw createException(message, ERROR_TYPES.STEP_TOO_FEW);
         }
     }
 
@@ -75,7 +69,7 @@ public class GherkinAssert {
             for (GherkinScenario scenario : featureDefinition.scenarios) {
                 message += scenario.printScenarioTitle() + "\n";
             }
-            throw createException(message);
+            throw createException(message, ERROR_TYPES.SCENARIO_MISMATCH);
         }
 
         return result;
@@ -83,7 +77,7 @@ public class GherkinAssert {
 
     public static void currentScenarioIsValid(GherkinScenario currentScenario) {
         if (currentScenario == null) {
-            throw createException();
+            throw createException(ERROR_TYPES.SCENARIO_NULL);
         }
     }
 
@@ -95,29 +89,20 @@ public class GherkinAssert {
                             "But it looks like that: \n\n%s\n",
                     linkToScenarioDefinition.printScenario(),
                     progress.getCurrentScenario().clone(progress.getCurrentStep()).printScenario(), "EXTRA STEP");
-            throw createException(message);
+            throw createException(message, ERROR_TYPES.STEP_TOO_MANY);
         }
     }
 
     public static void nextStepIsAsExpected(GherkinProgress progress, GherkinScenario linkToScenarioDefinition, GherkinStep expectedNextStep) {
-        if (notTheSame(progress.getCurrentStep().type, expectedNextStep.type)) {
+        if (notTheSame(progress.getCurrentStep().type, expectedNextStep.type) ||
+                notTheSame(progress.getCurrentStep().getDescription(), expectedNextStep.getDescription())) {
             String message = String.format(
-                    "The type of the step is not identical to the expected type: \n" +
+                    "The step is not identical to the expected type: \n" +
                     "your scenario should be: \n\n%s\n" +
                     "But it looks like that: \n\n%s\n",
                     linkToScenarioDefinition.printScenario(),
                     progress.getCurrentScenario().printScenario(), "WRONG STEP TYPE");
-            throw createException(message);
-        }
-
-        if (notTheSame(progress.getCurrentStep().getDescription(), expectedNextStep.getDescription())) {
-            String message = String.format(
-                    "The description of the step is not identical to the expected description: \n" +
-                    "your scenario should be: \n\n%s\n" +
-                    "But it looks like that: \n\n%s\n",
-                    linkToScenarioDefinition.printScenario(),
-                    progress.getCurrentScenario().clone(progress.getCurrentStep()).printScenario(), "WRONG DESCRIPTION");
-            throw createException(message);
+            throw createException(message, ERROR_TYPES.STEP_MISMATCH);
         }
     }
 
@@ -140,12 +125,12 @@ public class GherkinAssert {
         return !notTheSame(str1, str2);
     }
 
-    private static JCCannotContinueException createException(String message) {
-        return new JCCannotContinueException(message);
+    private static JCCannotContinueException createException(String message, ERROR_TYPES id) {
+        return new JCCannotContinueException(message, id);
     }
 
-    private static JCCannotContinueException createException() {
-        return new JCCannotContinueException();
+    private static JCCannotContinueException createException(ERROR_TYPES id) {
+        return new JCCannotContinueException("", id);
     }
 
     public static void sameNumberOfScenarios(GherkinFeature featureFile, GherkinProgress progress, HashMap<GherkinScenario, GherkinScenario> file2actual) {
@@ -175,7 +160,7 @@ public class GherkinAssert {
                 message+="\n\n";
             }
 
-            throw createException(message);
+            throw createException(message, ERROR_TYPES.SCENARIO_TOO_FEW);
         }
     }
 }
