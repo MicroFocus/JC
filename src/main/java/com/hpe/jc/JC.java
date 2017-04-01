@@ -6,11 +6,8 @@ package com.hpe.jc;
 
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.gherkin.GherkinFeature;
-import com.hpe.jc.gherkin.GherkinProgress;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
-import com.hpe.jc.plugins.JCCannotContinueException;
-import com.hpe.jc.plugins.JCPlugin;
 
 public class JC {
 
@@ -28,7 +25,7 @@ public class JC {
      * Constructors methods - JC definitions
      *********************************/
 
-    // Using this constructor will compare between feature file and actual scenarios and steps
+    // Using this constructor will compare between feature file and actual steps and steps
     public JC(Object test, JCPlugin[] plugins, String featureDescription) {
 
         progress = new GherkinProgress(test, plugins);

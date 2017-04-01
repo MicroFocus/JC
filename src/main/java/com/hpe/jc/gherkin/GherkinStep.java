@@ -6,6 +6,8 @@ package com.hpe.jc.gherkin;
 public class GherkinStep extends GherkinBaseEntity {
     public String type;
 
+    public GherkinScenario parent;
+
     public GherkinStep(String type, String description) {
         super(description);
         this.type = type;

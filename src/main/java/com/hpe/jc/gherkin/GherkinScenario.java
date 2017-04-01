@@ -7,6 +7,8 @@ import java.util.ArrayList;
  */
 public class GherkinScenario extends GherkinBaseEntity{
 
+    public GherkinFeature parent;
+
     public ArrayList<GherkinStep> steps = new ArrayList<GherkinStep>();
 
     public GherkinScenario(String description) {

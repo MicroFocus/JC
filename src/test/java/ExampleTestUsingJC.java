@@ -1,8 +1,7 @@
 import com.hpe.jc.JC;
 import com.hpe.jc.plugins.JCPValidateFlowBy;
-import com.hpe.jc.plugins.JCPlugin;
+import com.hpe.jc.JCPlugin;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -10,13 +9,13 @@ import org.junit.Test;
  */
 
 
-public class MyTestsTest {
+public class ExampleTestUsingJC {
 
     //TODO: support annotations for plugins and feature description
     //TODO: add init method to plugin + init with progress + remove progress signature from all plugins
     //TODO: add plugin dependency so that Octane plugin can demand syntax validator plugin and extract info from it.
     public static JC jc = new JC(
-            MyTestsTest.class,
+            ExampleTestUsingJC.class,
             new JCPlugin[]{new JCPValidateFlowBy("c:\\gherkin.feature")},
             "hello world");
 
@@ -35,16 +34,14 @@ public class MyTestsTest {
 
     @Test
     public void myTest2() {
-        jc.scenario("this is the second2 scenario", ()-> {
+        jc.scenario("this is the second scenario", ()-> {
 
             jc.given("another try");
 
             jc.when("I do something");
-            Assert.assertEquals(1,2);
+            //Assert.assertEquals(1,2);
 
             jc.then("it happens");
-
-            //jc.and("bla!");
 
         });
 

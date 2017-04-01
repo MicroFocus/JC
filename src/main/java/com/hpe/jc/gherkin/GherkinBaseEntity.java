@@ -1,11 +1,12 @@
 package com.hpe.jc.gherkin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by koreny on 3/31/2017.
  */
-public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionHolder {
+public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionHolder, IJCPluginDataHolder {
     private String description;
 
     // when the plugin has a bug... logged but do not stop the test
@@ -62,5 +63,16 @@ public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionH
     }
 
 
+    HashMap<Class, Object> pluginData = new HashMap<>();
+
+    @Override
+    public void setData(Class plugin, Object data) {
+        pluginData.put(plugin, data);
+    }
+
+    @Override
+    public Object getData(Class plugin) {
+        return pluginData.get(plugin);
+    }
 
 }

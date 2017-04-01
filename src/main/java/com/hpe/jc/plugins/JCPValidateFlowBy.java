@@ -1,10 +1,9 @@
 package com.hpe.jc.plugins;
 
+import com.hpe.jc.GherkinProgress;
+import com.hpe.jc.JCPlugin;
 import com.hpe.jc.errors.GherkinAssert;
-import com.hpe.jc.gherkin.GherkinFeature;
-import com.hpe.jc.gherkin.GherkinProgress;
-import com.hpe.jc.gherkin.GherkinScenario;
-import com.hpe.jc.gherkin.GherkinStep;
+import com.hpe.jc.gherkin.*;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
 
@@ -65,25 +64,21 @@ public class JCPValidateFlowBy extends JCPlugin {
     }
 
 
-    @Override
-    public void onFeatureStart(GherkinProgress progress) {
+    protected void onFeatureStart() {
         GherkinAssert.SameFeature(featureFile, progress.getCurrentFeature());
     }
 
-    @Override
-    public void onFeatureEnd(GherkinProgress progress) {
+    protected void onFeatureEnd() {
         GherkinAssert.sameNumberOfScenarios(featureFile, progress, file2actual);
     }
 
-    @Override
-    public void onScenarioStart(GherkinProgress progress) {
+    protected void onScenarioStart() {
         linkToScenarioDefinition = GherkinAssert.featureContainsScenario(featureFile, progress.getCurrentScenario());
         file2actual.put(linkToScenarioDefinition, progress.getCurrentScenario());
         linkToStepDefinition = null;
     }
 
-    @Override
-    public void onScenarioEnd(GherkinProgress progress) {
+    protected void onScenarioEnd() {
         boolean noMeaningfulExceptions =
                 progress.getCurrentScenario().getFatalExceptions().size()==0 &&
                 progress.getCurrentScenario().getTestExceptions().size()==0;
@@ -95,8 +90,7 @@ public class JCPValidateFlowBy extends JCPlugin {
         linkToScenarioDefinition = null;
     }
 
-    @Override
-    public void onStepStart(GherkinProgress progress) {
+    protected void onStepStart() {
         GherkinStep expectedStep = linkToScenarioDefinition.getNextStep(linkToStepDefinition);
         GherkinAssert.validExpectedNextStep(progress, linkToScenarioDefinition, expectedStep);
         GherkinAssert.nextStepIsAsExpected(progress, linkToScenarioDefinition, expectedStep);
@@ -105,13 +99,12 @@ public class JCPValidateFlowBy extends JCPlugin {
         linkToStepDefinition = expectedStep;
     }
 
-    @Override
-    public void onStepEnd(GherkinProgress progress) {
+    protected void onStepEnd() {
 
     }
 
-    @Override
-    public void onStepFailure(GherkinProgress progress, Throwable ex) {
+
+    protected void onStepFailure(Throwable ex) {
 
     }
 }
