@@ -1,6 +1,7 @@
-package com.hpe.jc.plugins;
+package com.hpe.jc;
 
 import com.hpe.jc.errors.GherkinAssert;
+import com.hpe.jc.JCPlugin;
 
 /**
  * Created by koreny on 3/25/2017.

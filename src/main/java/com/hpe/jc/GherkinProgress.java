@@ -1,8 +1,7 @@
-package com.hpe.jc.gherkin;
+package com.hpe.jc;
 
 import com.hpe.jc.errors.GherkinAssert;
-import com.hpe.jc.plugins.JCPlugin;
-import com.hpe.jc.plugins.PluginManager;
+import com.hpe.jc.gherkin.*;
 
 /**
  * Created by koreny on 3/21/2017.
@@ -11,12 +10,14 @@ public class GherkinProgress {
 
     public GherkinProgress(Object test) {
         this.test = test;
+        pluginManager.setProgress(this);
     }
 
     public GherkinProgress(Object test, JCPlugin[] plugins) {
         this(test);
 
         for (JCPlugin plugin : plugins) {
+            plugin.setProgress(this);
             pluginManager.registerPlugin(plugin);
         }
     }
@@ -28,6 +29,7 @@ public class GherkinProgress {
     private GherkinFeature currentFeature;
     private GherkinScenario currentScenario;
     private GherkinStep currentStep;
+    private GherkinBaseEntity current;
 
     // execute the plugins. Funny that it is a plugin itself...
     private PluginManager pluginManager = new PluginManager();
@@ -44,6 +46,40 @@ public class GherkinProgress {
 
     public GherkinStep getCurrentStep() { return currentStep; }
 
+    public GherkinBaseEntity getCurrent() { return current; }
+
+    private void setCurrentFeature(GherkinFeature feature) {
+        if (feature==null) {
+            currentFeature = null;
+            current = null;
+        } else {
+            currentFeature = feature;
+            current = feature;
+        }
+    }
+
+    private void setCurrentScenario(GherkinScenario scenario) {
+        if (scenario == null) {
+            current = currentScenario.parent;
+            currentScenario = null;
+        } else {
+            scenario.parent = currentFeature;
+            currentScenario = scenario;
+            current = scenario;
+        }
+    }
+
+    private void setCurrentStep(GherkinStep step) {
+        if (step == null) {
+            current = currentStep.parent;
+            currentStep = null;
+        } else {
+            step.parent = currentScenario;
+            currentStep = step;
+            current = step;
+        }
+    }
+
     public boolean isCurrentScenarioHasException() {
         return currentScenario.getTestExceptions().size()>0;
     }
@@ -53,16 +89,14 @@ public class GherkinProgress {
      *************************************/
 
     public void updateFeature(GherkinFeature actualFeature) {
-            // end of feature
+        // end of feature
         if (actualFeature == null) {
-            pluginManager.onFeatureEnd(this);
-            currentFeature = actualFeature;
-
+            pluginManager.onFeatureEnd();
+            current = currentFeature = null;
         } else {
             // start of feature
-            currentFeature = actualFeature;
-            pluginManager.onFeatureStart(this);
-
+            current = currentFeature = actualFeature;
+            pluginManager.onFeatureStart();
         }
     }
 
@@ -77,19 +111,22 @@ public class GherkinProgress {
         if (actualScenario == null) {
             // end last step if there is one
             if (currentStep!=null) {
-                pluginManager.onStepEnd(this);
+                pluginManager.onStepEnd();
+                current = currentStep.parent;
                 currentStep = null;
             }
-            pluginManager.onScenarioEnd(this);
+            pluginManager.onScenarioEnd();
             // if feature definition exists -> check # of steps
+            current = currentScenario.parent;
             currentScenario = null;
 
         } else {
 
             // signal start of new scenario
             // currentScenario might not be null if previous scenario throw an exception
-            currentScenario = actualScenario;
-            pluginManager.onScenarioStart(this);
+            actualScenario.parent = currentFeature;
+            current = currentScenario = actualScenario;
+            pluginManager.onScenarioStart();
             currentFeature.scenarios.add(currentScenario);
         }
     }
@@ -97,19 +134,21 @@ public class GherkinProgress {
     public void updateStep(GherkinStep nextStep) {
         // not first step in the scenario -> let's close the previous step
         if (currentStep != null) {
-            pluginManager.onStepEnd(this);
+            current = currentStep;
+            pluginManager.onStepEnd();
         }
         // this is null when exception is thrown in step and need to end it without open another one...
         if (nextStep != null) {
-            currentStep = nextStep;
-            pluginManager.onStepStart(this);
+            nextStep.parent = currentScenario;
+            current = currentStep = nextStep;
+            pluginManager.onStepStart();
             currentScenario.steps.add(currentStep);
             GherkinAssert.currentScenarioIsValid(currentScenario);
         }
     }
 
     public void updateException(Throwable ex) {
-        pluginManager.onStepFailure(this, ex);
+        pluginManager.onStepFailure(ex);
         if (currentStep != null) {
             currentStep.addTestException(ex);
         }

@@ -5,14 +5,11 @@
 import com.hpe.jc.JC;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.errors.JCException;
-import com.hpe.jc.gherkin.GherkinProgress;
-import com.hpe.jc.plugins.JCCannotContinueException;
+import com.hpe.jc.JCCannotContinueException;
 import com.hpe.jc.plugins.JCPValidateFlowBy;
-import com.hpe.jc.plugins.JCPlugin;
+import com.hpe.jc.JCPlugin;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 public class JCValidateFloByTests {
 
@@ -307,6 +304,33 @@ public class JCValidateFloByTests {
                 jc.given("121");
                 jc.when("122");
                 //jc.then("123");
+            });
+            jc.finished();
+        } catch (JCCannotContinueException ex) {
+            Assert.assertEquals(expectedId, ex.errorId);
+            return;
+        }
+
+        throw new RuntimeException("Got no error, expected error with ID " + expectedId.toString());
+    }
+
+    @Test
+    public void TestErrorTooManySteps() {
+        ValidateMock validate = new ValidateMock(script);
+
+        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_TOO_MANY;
+        try {
+            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
+            jc.scenario("11", () -> {
+                jc.given("111");
+                jc.when("112");
+                jc.then("113");
+                jc.then("error");
+            });
+            jc.scenario("12", () -> {
+                jc.given("121");
+                jc.when("122");
+                jc.then("123");
             });
             jc.finished();
         } catch (JCCannotContinueException ex) {

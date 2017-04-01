@@ -1,10 +1,10 @@
 package com.hpe.jc.errors;
 
 import com.hpe.jc.gherkin.GherkinFeature;
-import com.hpe.jc.gherkin.GherkinProgress;
+import com.hpe.jc.GherkinProgress;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
-import com.hpe.jc.plugins.JCCannotContinueException;
+import com.hpe.jc.JCCannotContinueException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,9 +63,9 @@ public class GherkinAssert {
         // error if no find
         if (result == null) {
             String message = String.format(
-                    "Your scenario description does not match any of the scenarios on the feature file\n" +
+                    "Your scenario description does not match any of the steps on the feature file\n" +
                     "This is your scenario: \n%s\n\n" +
-                    "These are all the scenarios found in the feature file:\n\n", actualScenario.printScenarioTitle());
+                    "These are all the steps found in the feature file:\n\n", actualScenario.printScenarioTitle());
             for (GherkinScenario scenario : featureDefinition.scenarios) {
                 message += scenario.printScenarioTitle() + "\n";
             }
@@ -135,13 +135,13 @@ public class GherkinAssert {
 
     public static void sameNumberOfScenarios(GherkinFeature featureFile, GherkinProgress progress, HashMap<GherkinScenario, GherkinScenario> file2actual) {
 
-        // let's fill this with forgotten scenarios...
+        // let's fill this with forgotten steps...
         ArrayList<GherkinScenario> scenariosToImplement = new ArrayList<>();
 
         int scenarioDif = featureFile.scenarios.size() - progress.getCurrentFeature().scenarios.size();
-        // forgot to implement some scenarios from within the feature definition
+        // forgot to implement some steps from within the feature definition
         if (scenarioDif > 0) {
-            String message = String.format("You forgot to implement %s scenarios:\n", String.valueOf(scenarioDif));
+            String message = String.format("You forgot to implement %s steps:\n", String.valueOf(scenarioDif));
             for (GherkinScenario scenarioDef : featureFile.scenarios) {
                 if (!file2actual.containsKey(scenarioDef)) {
                     scenariosToImplement.add(scenarioDef);
@@ -153,7 +153,7 @@ public class GherkinAssert {
                 message+="\n";
             }
 
-            message += "\nimplement missing scenarios using below code:\n\n";
+            message += "\nimplement missing steps using below code:\n\n";
 
             for (GherkinScenario scenario : scenariosToImplement) {
                 message+= scenario.printScenarioCode();

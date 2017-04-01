@@ -1,9 +1,9 @@
 /**
  * Created by koreny on 3/20/2017.
  */
-import com.hpe.jc.gherkin.GherkinProgress;
+import com.hpe.jc.GherkinProgress;
 import com.hpe.jc.JC;
-import com.hpe.jc.plugins.JCPlugin;
+import com.hpe.jc.JCPlugin;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -455,43 +455,42 @@ public class JCCoreTests {
 
         public ArrayList<String> log = new ArrayList<>();
 
-        @Override
-        public void onFeatureStart(GherkinProgress progress) {
+        protected void onFeatureStart() {
+            Assert.assertEquals(progress.getCurrentFeature(), progress.getCurrent());
             log.add("s"+progress.getCurrentFeature().getDescription());
         }
 
-        @Override
-        public void onFeatureEnd(GherkinProgress progress) {
+        protected void onFeatureEnd() {
+            Assert.assertEquals(progress.getCurrentFeature(), progress.getCurrent());
             log.add("e"+progress.getCurrentFeature().getDescription());
 
         }
 
-        @Override
-        public void onScenarioStart(GherkinProgress progress) {
+        protected void onScenarioStart() {
+            Assert.assertEquals(progress.getCurrentScenario(), progress.getCurrent());
             log.add("s"+progress.getCurrentScenario().getDescription());
 
         }
 
-        @Override
-        public void onScenarioEnd(GherkinProgress progress) {
+        protected void onScenarioEnd() {
+            Assert.assertEquals(progress.getCurrentScenario(), progress.getCurrent());
             log.add("e"+progress.getCurrentScenario().getDescription());
 
         }
 
-        @Override
-        public void onStepStart(GherkinProgress progress) {
+        protected void onStepStart() {
+            Assert.assertEquals(progress.getCurrentStep(), progress.getCurrent());
             log.add("s"+progress.getCurrentStep().getDescription());
 
         }
 
-        @Override
-        public void onStepEnd(GherkinProgress progress) {
+        protected void onStepEnd() {
+            Assert.assertEquals(progress.getCurrentStep(), progress.getCurrent());
             log.add("e"+progress.getCurrentStep().getDescription());
 
         }
 
-        @Override
-        public void onStepFailure(GherkinProgress progress, Throwable ex) {
+        protected void onStepFailure(Throwable ex) {
             if (progress.getCurrentStep()!=null) {
                 log.add("f"+progress.getCurrentStep().getDescription());
             } else {

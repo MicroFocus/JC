@@ -22,7 +22,7 @@ public class MyCucumberTest {
             jc.given( "I use JC");
             // automation code here...
             
-            jc.when("I log my steps");
+            jc.when(children);
             // automation code here...
 
             jc.then("I get a Gherkin report at the end");
@@ -38,7 +38,7 @@ public class MyCucumberTest {
             
             jc.when("I run the junit test");
             
-            jc.then("it will compare the steps to the feature file defined above and tell you that <p1> is different");
+            jc.then(children);
             
         });
     }
