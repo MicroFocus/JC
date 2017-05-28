@@ -103,4 +103,12 @@ public class GherkinScenario extends GherkinBaseEntity{
         return result.substring(0,1).toLowerCase() + result.substring(1);
     }
 
+    @Override
+    public String printGherkin() {
+        String result = String.format("Scenario: %s\n", getDescription());
+        for (GherkinStep step : steps) {
+            result += String.format("%s\n", step.printGherkin());
+        }
+        return result;
+    }
 }

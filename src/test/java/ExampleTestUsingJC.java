@@ -1,7 +1,10 @@
 import com.hpe.jc.JC;
+import com.hpe.jc.plugins.OctaneFormatter.JCOctaneCucumberFormatter;
 import com.hpe.jc.plugins.JCPValidateFlowBy;
 import com.hpe.jc.JCPlugin;
+import com.hpe.jc.plugins.JCTimePlugin;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -11,12 +14,9 @@ import org.junit.Test;
 
 public class ExampleTestUsingJC {
 
-    //TODO: support annotations for plugins and feature description
-    //TODO: add init method to plugin + init with progress + remove progress signature from all plugins
-    //TODO: add plugin dependency so that Octane plugin can demand syntax validator plugin and extract info from it.
     public static JC jc = new JC(
             ExampleTestUsingJC.class,
-            new JCPlugin[]{new JCPValidateFlowBy("c:\\gherkin.feature")},
+            new JCPlugin[]{new JCPValidateFlowBy("c:\\gherkin.feature"), new JCOctaneCucumberFormatter(), new JCTimePlugin()},
             "hello world");
 
 
@@ -39,7 +39,7 @@ public class ExampleTestUsingJC {
             jc.given("another try");
 
             jc.when("I do something");
-            //Assert.assertEquals(1,2);
+            Assert.assertEquals(1,2);
 
             jc.then("it happens");
 

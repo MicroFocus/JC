@@ -7,6 +7,7 @@ import com.hpe.jc.JCPlugin;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 
 public class JCCoreTests {
@@ -454,6 +455,16 @@ public class JCCoreTests {
     class LogPlugin extends JCPlugin {
 
         public ArrayList<String> log = new ArrayList<>();
+
+        @Override
+        protected void onEndOfAny() {
+
+        }
+
+        @Override
+        protected void onStartOfAny() {
+
+        }
 
         protected void onFeatureStart() {
             Assert.assertEquals(progress.getCurrentFeature(), progress.getCurrent());

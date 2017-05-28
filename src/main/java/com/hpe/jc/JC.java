@@ -121,6 +121,7 @@ public class JC {
     }
 
     public void finished() {
+
         progress.updateFeature(null);
     }
 }

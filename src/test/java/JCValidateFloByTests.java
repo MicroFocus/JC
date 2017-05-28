@@ -536,7 +536,7 @@ public class JCValidateFloByTests {
     class ValidateMock extends JCPValidateFlowBy {
         public ValidateMock(String script) {
                 super();
-                this.featureFile = parseGherkinScript(script);
+                this.expectedFeature = parseGherkinScript(script);
         }
     }
 
