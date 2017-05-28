@@ -17,4 +17,8 @@ public class GherkinStep extends GherkinBaseEntity {
         return String.format("|    %s %s", type.trim(), getDescription().trim());
     }
 
+    @Override
+    public String printGherkin() {
+        return String.format("%s %s", type, getDescription());
+    }
 }

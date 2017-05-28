@@ -6,4 +6,8 @@ package com.hpe.jc.gherkin;
 public interface IJCPluginDataHolder {
     void setData(Class plugin, Object data);
     Object getData(Class plugin);
+
+    void setData(Class plugin, String key, Object data);
+    Object getData(Class plugin, String key);
+
 }

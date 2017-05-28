@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * Created by koreny on 3/31/2017.
  */
-public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionHolder, IJCPluginDataHolder {
+public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionHolder, IJCPluginDataHolder, IPrintMyself {
     private String description;
 
     // when the plugin has a bug... logged but do not stop the test
@@ -64,6 +64,7 @@ public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionH
 
 
     HashMap<Class, Object> pluginData = new HashMap<>();
+    HashMap<Class, HashMap<String, Object>> pluginDataWithKey = new HashMap<>();
 
     @Override
     public void setData(Class plugin, Object data) {
@@ -73,6 +74,22 @@ public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionH
     @Override
     public Object getData(Class plugin) {
         return pluginData.get(plugin);
+    }
+
+    @Override
+    public void setData(Class plugin, String key, Object data)
+    {
+        if (!pluginDataWithKey.containsKey(plugin)) {
+            HashMap<String, Object> newHash = new HashMap<String, Object>();
+            pluginDataWithKey.put(plugin, newHash);
+        }
+        pluginDataWithKey.get(plugin).put(key, data);
+    }
+
+    @Override
+    public Object getData(Class plugin, String key)
+    {
+        return pluginDataWithKey.get(plugin).get(key);
     }
 
 }

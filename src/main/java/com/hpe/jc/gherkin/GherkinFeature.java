@@ -8,10 +8,17 @@ import java.util.ArrayList;
 public class GherkinFeature extends GherkinBaseEntity {
 
     public ArrayList<GherkinScenario> scenarios = new ArrayList<GherkinScenario>();
+    public ArrayList<String> tags = new ArrayList<>();
 
     public GherkinFeature(String featureDescription) {
         super(featureDescription);
     }
 
-
+    public String printGherkin() {
+        String result = String.format("Feature: %s\n\n", getDescription());
+        for (GherkinScenario scenario : scenarios) {
+            result += String.format("%s\n\n", scenario.printGherkin());
+        }
+        return result;
+    }
 }

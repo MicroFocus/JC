@@ -11,19 +11,20 @@ import java.util.List;
  */
 public class GherkinLexerListener implements Listener {
 
-    public GherkinFeature currentFeature;
+    public GherkinFeature currentFeature = new GherkinFeature("");
     GherkinScenario currentScenario;
     GherkinStep currentStep;
 
     public void comment(String s, Integer integer) {
     }
 
-    public void tag(String s, Integer integer) {
+    public void tag(String s, Integer line) {
+        currentFeature.tags.add(s);
     }
 
-    public void feature(String s, String s1, String s2, Integer integer) {
+    public void feature(String element, String description, String s2, Integer line) {
 
-        currentFeature = new GherkinFeature(s1);
+        currentFeature.setDescription(description);
     }
 
     public void background(String s, String s1, String s2, Integer integer) {

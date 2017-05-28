@@ -1,15 +1,16 @@
 package com.hpe.jc.plugins;
 
-import com.hpe.jc.GherkinProgress;
 import com.hpe.jc.JCPlugin;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.gherkin.*;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -17,14 +18,30 @@ import java.util.HashMap;
  */
 public class JCPValidateFlowBy extends JCPlugin {
 
+    /*********************************
+     * Members
+     *********************************/
+
+    public static final String EXPECTED_FEATURE = "EXPECTED_FEATURE";
+    public static final String EXPECTED_SCRIPT = "EXPECTED_SCRIPT";
+    public static final String EXPECTED_TO_ACTUAL_SCENARIO_MAP = "EXPECTED_TO_ACTUAL_SCENARIO_MAP";
+    public static final String EXPECTED_TO_ACTUAL_STEP_MAP = "EXPECTED_TO_ACTUAL_STEP_MAP";
+
     // contains the feature file data (taken from the @feature annotation)
-    protected GherkinFeature featureFile;
+    protected GherkinFeature expectedFeature;
 
     // used to link to expected scenario and step from feature definition. Updated in start of scenario / step.
-    private GherkinScenario linkToScenarioDefinition;
-    private GherkinStep linkToStepDefinition;
+    private GherkinScenario expectedScenario;
+    private GherkinStep expectedStep;
 
-    HashMap<GherkinScenario, GherkinScenario> file2actual = new HashMap<GherkinScenario, GherkinScenario>();
+    String expectedScript;
+    HashMap<GherkinScenario, GherkinScenario> expectedScenarioToActualMap = new HashMap<>();
+    HashMap<GherkinStep, GherkinStep> expectedStepToActualMap = new HashMap<>();
+
+
+    /*********************************
+     * Constructors
+     *********************************/
 
     protected JCPValidateFlowBy() {
 
@@ -33,15 +50,37 @@ public class JCPValidateFlowBy extends JCPlugin {
     public JCPValidateFlowBy(String featureFileLocation) {
 
         // load and parse gherkin script
-        String gherkinScript = readGherkinScript(featureFileLocation);
-        GherkinFeature featureFile = parseGherkinScript(gherkinScript);
+        expectedScript = readGherkinScript(featureFileLocation);
+        GherkinFeature expectedFeature = parseGherkinScript(expectedScript);
 
-        this.featureFile = featureFile;
+        this.expectedFeature = expectedFeature;
     }
+
+    /*********************************
+     * Plugin getters
+     *********************************/
+
+    public static GherkinFeature getExpectedFeature(GherkinFeature feature) {
+        return (GherkinFeature)feature.getData(JCPValidateFlowBy.class, EXPECTED_FEATURE);
+    }
+
+    public static String getExpectedScript(GherkinFeature feature) {
+        return (String)feature.getData(JCPValidateFlowBy.class, EXPECTED_SCRIPT);
+    }
+
+    public static HashMap<GherkinScenario, GherkinScenario> getExpectedToActualScenarioMap(GherkinFeature feature) {
+        return (HashMap<GherkinScenario, GherkinScenario>)feature.getData(JCPValidateFlowBy.class, EXPECTED_TO_ACTUAL_SCENARIO_MAP);
+    }
+
+    public static HashMap<GherkinStep, GherkinStep> getExpectedToActualStepMap(GherkinFeature feature) {
+        return (HashMap<GherkinStep, GherkinStep>)feature.getData(JCPValidateFlowBy.class, EXPECTED_TO_ACTUAL_STEP_MAP);
+    }
+
 
     /*********************************
      * Private methods
      *********************************/
+
 
     private static String readGherkinScript(String scriptPath) {
 
@@ -63,19 +102,36 @@ public class JCPValidateFlowBy extends JCPlugin {
         return listener.currentFeature;
     }
 
+    /*********************************
+     * Plugin implementation
+     *********************************/
+
+    @Override
+    protected void onEndOfAny() {
+
+    }
+
+    @Override
+    protected void onStartOfAny() {
+
+    }
 
     protected void onFeatureStart() {
-        GherkinAssert.SameFeature(featureFile, progress.getCurrentFeature());
+        progress.getCurrentFeature().setData(this.getClass(), EXPECTED_FEATURE, expectedFeature);
+        progress.getCurrentFeature().setData(this.getClass(), EXPECTED_SCRIPT, expectedScript);
+        GherkinAssert.SameFeature(expectedFeature, progress.getCurrentFeature());
     }
 
     protected void onFeatureEnd() {
-        GherkinAssert.sameNumberOfScenarios(featureFile, progress, file2actual);
+        progress.getCurrentFeature().setData(this.getClass(), EXPECTED_TO_ACTUAL_SCENARIO_MAP, expectedScenarioToActualMap);
+        progress.getCurrentFeature().setData(this.getClass(), EXPECTED_TO_ACTUAL_STEP_MAP, expectedStepToActualMap);
+        GherkinAssert.sameNumberOfScenarios(expectedFeature, progress, expectedScenarioToActualMap);
     }
 
     protected void onScenarioStart() {
-        linkToScenarioDefinition = GherkinAssert.featureContainsScenario(featureFile, progress.getCurrentScenario());
-        file2actual.put(linkToScenarioDefinition, progress.getCurrentScenario());
-        linkToStepDefinition = null;
+        expectedScenario = GherkinAssert.featureContainsScenario(expectedFeature, progress.getCurrentScenario());
+        expectedScenarioToActualMap.put(expectedScenario, progress.getCurrentScenario());
+        expectedStep = null;
     }
 
     protected void onScenarioEnd() {
@@ -85,18 +141,25 @@ public class JCPValidateFlowBy extends JCPlugin {
 
         // if there were exceptions - no point checking scenario, as it most probably didn't run.
         if (noMeaningfulExceptions) {
-            GherkinAssert.ScenarioHasAllSteps(linkToScenarioDefinition, progress.getCurrentScenario());
+            GherkinAssert.ScenarioHasAllSteps(expectedScenario, progress.getCurrentScenario());
         }
-        linkToScenarioDefinition = null;
+        expectedScenario = null;
     }
 
     protected void onStepStart() {
-        GherkinStep expectedStep = linkToScenarioDefinition.getNextStep(linkToStepDefinition);
-        GherkinAssert.validExpectedNextStep(progress, linkToScenarioDefinition, expectedStep);
-        GherkinAssert.nextStepIsAsExpected(progress, linkToScenarioDefinition, expectedStep);
+        GherkinStep expectedStep = expectedScenario.getNextStep(this.expectedStep);
+
+        // step is not null
+        GherkinAssert.validExpectedNextStep(progress, expectedScenario, expectedStep);
+
+        // we link the steps before validating expected step because if validation fails, error will be logged at current steps and we want access to them from this expected step
+        expectedStepToActualMap.put(expectedStep, progress.getCurrentStep());
+
+        // now validating correct actual step
+        GherkinAssert.nextStepIsAsExpected(progress, expectedScenario, expectedStep);
 
         // update link if everything is ok
-        linkToStepDefinition = expectedStep;
+        this.expectedStep = expectedStep;
     }
 
     protected void onStepEnd() {

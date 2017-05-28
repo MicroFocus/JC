@@ -2,6 +2,7 @@ package com.hpe.jc;
 
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.gherkin.*;
+import com.hpe.jc.plugins.IJCDataGetter;
 
 /**
  * Created by koreny on 3/21/2017.
@@ -16,10 +17,7 @@ public class GherkinProgress {
     public GherkinProgress(Object test, JCPlugin[] plugins) {
         this(test);
 
-        for (JCPlugin plugin : plugins) {
-            plugin.setProgress(this);
-            pluginManager.registerPlugin(plugin);
-        }
+        pluginManager.registerPlugins(this, plugins);
     }
 
     // save tested class (for possibly reporting the name of the class only, no real need of it)
@@ -47,38 +45,6 @@ public class GherkinProgress {
     public GherkinStep getCurrentStep() { return currentStep; }
 
     public GherkinBaseEntity getCurrent() { return current; }
-
-    private void setCurrentFeature(GherkinFeature feature) {
-        if (feature==null) {
-            currentFeature = null;
-            current = null;
-        } else {
-            currentFeature = feature;
-            current = feature;
-        }
-    }
-
-    private void setCurrentScenario(GherkinScenario scenario) {
-        if (scenario == null) {
-            current = currentScenario.parent;
-            currentScenario = null;
-        } else {
-            scenario.parent = currentFeature;
-            currentScenario = scenario;
-            current = scenario;
-        }
-    }
-
-    private void setCurrentStep(GherkinStep step) {
-        if (step == null) {
-            current = currentStep.parent;
-            currentStep = null;
-        } else {
-            step.parent = currentScenario;
-            currentStep = step;
-            current = step;
-        }
-    }
 
     public boolean isCurrentScenarioHasException() {
         return currentScenario.getTestExceptions().size()>0;
