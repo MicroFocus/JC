@@ -31,6 +31,9 @@ import static com.hpe.jc.plugins.OctaneFormatter.GherkinSerializer.*;
 public class JCOctaneCucumberFormatter extends JCPlugin {
 
     @Override
+    protected void onInit() { }
+
+    @Override
     protected void onEndOfAny() {
 
     }
@@ -132,7 +135,7 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
 
         // Adding the feature members
         feature.setAttribute("name", expectedFeature.getDescription());
-        feature.setAttribute("path", "todo: implement get path of feature file");
+        feature.setAttribute("path", JCPValidateFlowBy.getFeatureFileLocation(actualFeature));
         feature.setAttribute("tag", getOctaneTag(expectedFeature));
 
         // get start date/time
