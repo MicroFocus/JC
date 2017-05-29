@@ -205,9 +205,10 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
 
         if (actualStep == null) {
             step.setAttribute("name", expectedStep.getDescription());
-            step.setAttribute("status", "failed");
+            step.setAttribute("status", "skipped");
             step.setAttribute("duration", "0");
-            errorMessages += String.format("step is not implemented");
+
+            errorMessages += String.format("step was skipped due to error in previous step");
 
         } else {
             Date startTime = JCTimePlugin.getStartTime(actualStep);
