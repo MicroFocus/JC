@@ -36,6 +36,10 @@ public class GherkinProgress {
      * Public methods
      *************************************/
 
+    public Object getTestObject() {
+        return test;
+    }
+
     public GherkinFeature getCurrentFeature() { return currentFeature; }
 
     public GherkinScenario getCurrentScenario() {

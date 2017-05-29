@@ -38,6 +38,9 @@ public class JCTimePlugin extends JCPlugin {
      *********************************/
 
     @Override
+    protected void onInit() { }
+
+    @Override
     protected void onEndOfAny() {
         progress.getCurrent().setData(this.getClass(), END_TIME, new Date());
     }

@@ -1,6 +1,8 @@
 package com.hpe.jc;
 
 import com.hpe.jc.gherkin.GherkinBaseEntity;
+import com.hpe.jc.gherkin.GherkinMock;
+import com.hpe.jc.gherkin.IJCExceptionHolder;
 import com.hpe.jc.plugins.IJCRunPlugin;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.HashMap;
 public class PluginManager extends JCPlugin {
 
     ArrayList<JCPlugin> plugins = new ArrayList<>();
+    GherkinMock initExceptionHolder = new GherkinMock();
 
     public void registerPlugins(GherkinProgress progress, JCPlugin[] pluginsArr) {
         this.progress = progress;
@@ -17,13 +20,15 @@ public class PluginManager extends JCPlugin {
             plugin.setProgress(progress);
             plugins.add(plugin);
         }
+
+        onInit();
     }
 
     public ArrayList<JCPlugin> getPlugins() {
         return (ArrayList<JCPlugin>) plugins.clone();
     }
 
-    private void run(GherkinBaseEntity entity, IJCRunPlugin code) {
+    private void run(IJCExceptionHolder entity, IJCRunPlugin code) {
 
         for (JCPlugin plugin : plugins) {
             try {
@@ -36,6 +41,12 @@ public class PluginManager extends JCPlugin {
                 entity.addPluginException(ex);
             }
         }
+    }
+
+
+    @Override
+    protected void onInit() {
+        run(initExceptionHolder, (plugin)-> plugin.onInit());
     }
 
     @Override

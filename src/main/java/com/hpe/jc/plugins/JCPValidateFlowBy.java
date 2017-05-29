@@ -6,8 +6,11 @@ import com.hpe.jc.gherkin.*;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
 
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class JCPValidateFlowBy extends JCPlugin {
     public static final String EXPECTED_SCRIPT = "EXPECTED_SCRIPT";
     public static final String EXPECTED_TO_ACTUAL_SCENARIO_MAP = "EXPECTED_TO_ACTUAL_SCENARIO_MAP";
     public static final String EXPECTED_TO_ACTUAL_STEP_MAP = "EXPECTED_TO_ACTUAL_STEP_MAP";
+    public static final String SCRIPT_URL = "SCRIPT_URL";
 
     // contains the feature file data (taken from the @feature annotation)
     protected GherkinFeature expectedFeature;
@@ -35,6 +39,7 @@ public class JCPValidateFlowBy extends JCPlugin {
     private GherkinStep expectedStep;
 
     String expectedScript;
+    String featureFileLocation;
     HashMap<GherkinScenario, GherkinScenario> expectedScenarioToActualMap = new HashMap<>();
     HashMap<GherkinStep, GherkinStep> expectedStepToActualMap = new HashMap<>();
 
@@ -48,12 +53,7 @@ public class JCPValidateFlowBy extends JCPlugin {
     }
 
     public JCPValidateFlowBy(String featureFileLocation) {
-
-        // load and parse gherkin script
-        expectedScript = readGherkinScript(featureFileLocation);
-        GherkinFeature expectedFeature = parseGherkinScript(expectedScript);
-
-        this.expectedFeature = expectedFeature;
+        this.featureFileLocation = featureFileLocation;
     }
 
     /*********************************
@@ -76,22 +76,32 @@ public class JCPValidateFlowBy extends JCPlugin {
         return (HashMap<GherkinStep, GherkinStep>)feature.getData(JCPValidateFlowBy.class, EXPECTED_TO_ACTUAL_STEP_MAP);
     }
 
+    public static String getFeatureFileLocation(GherkinFeature feature) {
+        return (String)feature.getData(JCPValidateFlowBy.class, SCRIPT_URL);
+    }
+
 
     /*********************************
      * Private methods
      *********************************/
 
 
-    private static String readGherkinScript(String scriptPath) {
+    private static String readGherkinScript(Object testObj, String featureFileLocation) {
 
+        InputStream stream = testObj.getClass().getResourceAsStream(featureFileLocation);
+        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+
+/*
         String content = "";
         try {
-            content = new String(Files.readAllBytes(Paths.get(scriptPath)));
+            content = new String(Files.readAllBytes(Paths.get(featureFileLocation)));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return content;
+*/
     }
 
     protected static GherkinFeature parseGherkinScript(String script) {
@@ -107,6 +117,15 @@ public class JCPValidateFlowBy extends JCPlugin {
      *********************************/
 
     @Override
+    protected void onInit() {
+        // load and parse gherkin script
+
+        expectedScript = readGherkinScript(progress.getTestObject(), featureFileLocation);
+        expectedFeature = parseGherkinScript(expectedScript);
+    }
+
+
+    @Override
     protected void onEndOfAny() {
 
     }
@@ -119,6 +138,8 @@ public class JCPValidateFlowBy extends JCPlugin {
     protected void onFeatureStart() {
         progress.getCurrentFeature().setData(this.getClass(), EXPECTED_FEATURE, expectedFeature);
         progress.getCurrentFeature().setData(this.getClass(), EXPECTED_SCRIPT, expectedScript);
+        progress.getCurrentFeature().setData(this.getClass(), SCRIPT_URL, featureFileLocation);
+
         GherkinAssert.SameFeature(expectedFeature, progress.getCurrentFeature());
     }
 

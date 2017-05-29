@@ -19,6 +19,7 @@ public abstract class JCPlugin {
 
     protected abstract void onEndOfAny();
     protected abstract void onStartOfAny();
+    protected abstract void onInit();
     protected abstract void onFeatureStart();
     protected abstract void onFeatureEnd();
     protected abstract void onScenarioStart();

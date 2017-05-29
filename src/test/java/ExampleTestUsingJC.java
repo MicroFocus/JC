@@ -16,7 +16,7 @@ public class ExampleTestUsingJC {
 
     public static JC jc = new JC(
             ExampleTestUsingJC.class,
-            new JCPlugin[]{new JCPValidateFlowBy("c:\\gherkin.feature"), new JCOctaneCucumberFormatter(), new JCTimePlugin()},
+            new JCPlugin[]{new JCPValidateFlowBy("/gherkin2.feature"), new JCOctaneCucumberFormatter(), new JCTimePlugin()},
             "hello world");
 
 

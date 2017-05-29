@@ -456,6 +456,11 @@ public class JCCoreTests {
 
         public ArrayList<String> log = new ArrayList<>();
 
+
+        @Override
+        protected void onInit() { }
+
+
         @Override
         protected void onEndOfAny() {
 
