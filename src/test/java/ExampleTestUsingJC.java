@@ -25,10 +25,23 @@ public class ExampleTestUsingJC {
         jc.scenario("This is the first scenario", ()->{
 
             jc.given( "I have a scenario");
-
+            try {
+                Thread.sleep(16);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             jc.when("I run my junit test");
-
+            try {
+                Thread.sleep(32);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             jc.then("I can do this");
+            try {
+                Thread.sleep(64);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         });
     }
 
