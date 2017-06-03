@@ -1,5 +1,6 @@
 package com.hpe.jc.plugins;
 
+import com.hpe.jc.gherkin.GherkinBackground;
 import com.hpe.jc.gherkin.GherkinFeature;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
@@ -12,29 +13,35 @@ import java.util.List;
 public class GherkinLexerListener implements Listener {
 
     public GherkinFeature currentFeature = new GherkinFeature("");
+    GherkinBackground background = null;
     GherkinScenario currentScenario;
     GherkinStep currentStep;
 
     public void comment(String s, Integer integer) {
     }
 
-    public void tag(String s, Integer line) {
-        currentFeature.tags.add(s);
+    public void tag(String tagName, Integer line) {
+        currentFeature.tags.add(tagName);
     }
 
-    public void feature(String element, String description, String s2, Integer line) {
+    public void feature(String element, String title, String description, Integer line) {
 
-        currentFeature.setDescription(description);
+        currentFeature.setDescription(title);
     }
 
-    public void background(String s, String s1, String s2, Integer integer) {
+    public void background(String element, String title, String description, Integer line) {
+        currentScenario = currentFeature.background = background = new GherkinBackground(title);
+
     }
 
-    public void scenario(String s, String s1, String s2, Integer integer) {
-        GherkinScenario scenario = new GherkinScenario(s1);
+    public void scenario(String element, String title, String description, Integer integer) {
+        GherkinScenario scenario = new GherkinScenario(title);
 
         currentFeature.scenarios.add(scenario);
         currentScenario = scenario;
+        if (background != null) {
+            currentScenario.attachBackground(background.clone());
+        }
 
     }
 

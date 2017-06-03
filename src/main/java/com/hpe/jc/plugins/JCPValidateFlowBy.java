@@ -6,14 +6,7 @@ import com.hpe.jc.gherkin.*;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
 
-
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -91,17 +84,6 @@ public class JCPValidateFlowBy extends JCPlugin {
         InputStream stream = testObj.getClass().getResourceAsStream(featureFileLocation);
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
-
-/*
-        String content = "";
-        try {
-            content = new String(Files.readAllBytes(Paths.get(featureFileLocation)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return content;
-*/
     }
 
     protected static GherkinFeature parseGherkinScript(String script) {
@@ -124,6 +106,29 @@ public class JCPValidateFlowBy extends JCPlugin {
         expectedFeature = parseGherkinScript(expectedScript);
     }
 
+
+    @Override
+    protected void onBackgroundStart() {
+        //expectedScenario = GherkinAssert.featureContainsScenario(expectedFeature, progress.getCurrentScenario());
+        //expectedScenarioToActualMap.put(expectedScenario, progress.getCurrentScenario());
+        GherkinAssert.FeatureShouldContainABackground(expectedFeature, expectedScript);
+        GherkinAssert.BackgroundTitleShouldBeAsInDefinition(progress.getLatestBackground(), expectedFeature.background);
+        expectedScenario = expectedFeature.background;
+        expectedStep = null;
+    }
+
+    @Override
+    protected void onBackgroundEnd() {
+        boolean noMeaningfulExceptions =
+                progress.getCurrentScenario().getFatalExceptions().size()==0 &&
+                progress.getCurrentScenario().getTestExceptions().size()==0;
+
+        // if there were exceptions - no point checking scenario, as it most probably didn't run.
+        if (noMeaningfulExceptions) {
+            GherkinAssert.BackgroundShouldHaveAllSteps(expectedFeature.background, progress.getLatestBackground());
+        }
+        expectedScenario = null;
+    }
 
     @Override
     protected void onEndOfAny() {
@@ -151,6 +156,7 @@ public class JCPValidateFlowBy extends JCPlugin {
 
     protected void onScenarioStart() {
         expectedScenario = GherkinAssert.featureContainsScenario(expectedFeature, progress.getCurrentScenario());
+        GherkinAssert.backgroundShouldHaveBeenAttachedIfDefined(progress.getCurrentScenario(), expectedScenario);
         expectedScenarioToActualMap.put(expectedScenario, progress.getCurrentScenario());
         expectedStep = null;
     }

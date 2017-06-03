@@ -2,7 +2,6 @@ package com.hpe.jc;
 
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.gherkin.*;
-import com.hpe.jc.plugins.IJCDataGetter;
 
 /**
  * Created by koreny on 3/21/2017.
@@ -24,6 +23,7 @@ public class GherkinProgress {
     private Object test;
 
     // track current feature/scenario/step
+    private GherkinBackground latestBackground;
     private GherkinFeature currentFeature;
     private GherkinScenario currentScenario;
     private GherkinStep currentStep;
@@ -39,6 +39,8 @@ public class GherkinProgress {
     public Object getTestObject() {
         return test;
     }
+
+    public GherkinBackground getLatestBackground() { return latestBackground; }
 
     public GherkinFeature getCurrentFeature() { return currentFeature; }
 
@@ -61,6 +63,7 @@ public class GherkinProgress {
     public void updateFeature(GherkinFeature actualFeature) {
         // end of feature
         if (actualFeature == null) {
+            current = currentFeature;
             pluginManager.onFeatureEnd();
             current = currentFeature = null;
         } else {
@@ -86,20 +89,55 @@ public class GherkinProgress {
                 currentStep = null;
             }
             pluginManager.onScenarioEnd();
-            // if feature definition exists -> check # of steps
-            current = currentScenario.parent;
-            currentScenario = null;
+
+            //current = currentScenario.getParent();
+            //currentScenario = null;
 
         } else {
 
             // signal start of new scenario
-            // currentScenario might not be null if previous scenario throw an exception
-            actualScenario.parent = currentFeature;
+            boolean backgroundJustFinished = currentScenario instanceof GherkinBackground;
+            if (backgroundJustFinished) {
+                GherkinBackground latestBackground = (GherkinBackground) currentScenario;
+                actualScenario.attachBackground(latestBackground);
+            }
+            actualScenario.setParent(currentFeature);
             current = currentScenario = actualScenario;
             pluginManager.onScenarioStart();
             currentFeature.scenarios.add(currentScenario);
         }
     }
+
+
+    public void updateBackground(GherkinBackground background) {
+        // nothing to do if no scenario started, and reporting on end of scenario...
+        if (background == null && currentScenario == null) {
+            return;
+        }
+
+        // signal the end of current background
+        if (background == null) {
+            // end last step if there is one
+            if (currentStep!=null) {
+                pluginManager.onStepEnd();
+                current = currentStep.parent;
+                currentStep = null;
+            }
+            pluginManager.onBackgroundEnd();
+            //current = currentFeature;
+            //currentScenario = null;
+
+        } else {
+
+            // signal start of background
+            //background.setParent(currentFeature);
+            //currentFeature.background = background;
+            current = currentScenario = latestBackground = background;
+            pluginManager.onBackgroundStart();
+        }
+
+    }
+
 
     public void updateStep(GherkinStep nextStep) {
         // not first step in the scenario -> let's close the previous step
@@ -116,6 +154,7 @@ public class GherkinProgress {
             GherkinAssert.currentScenarioIsValid(currentScenario);
         }
     }
+
 
     public void updateException(Throwable ex) {
         pluginManager.onStepFailure(ex);

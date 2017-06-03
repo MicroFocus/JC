@@ -1,4 +1,4 @@
-/**
+package unitTests; /**
  * Created by koreny on 3/20/2017.
  */
 
@@ -6,10 +6,10 @@ import com.hpe.jc.JC;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.errors.JCException;
 import com.hpe.jc.JCCannotContinueException;
-import com.hpe.jc.plugins.JCPValidateFlowBy;
 import com.hpe.jc.JCPlugin;
 import org.junit.Assert;
 import org.junit.Test;
+import testUtils.ValidateMock;
 
 public class JCValidateFloByTests {
 
@@ -531,13 +531,6 @@ public class JCValidateFloByTests {
             Assert.assertEquals("error", ex.getCause().getMessage());
         }
         jc.finished();
-    }
-
-    class ValidateMock extends JCPValidateFlowBy {
-        public ValidateMock(String script) {
-                super();
-                this.expectedFeature = parseGherkinScript(script);
-        }
     }
 
 }

@@ -1,4 +1,4 @@
-/**
+package unitTests; /**
  * Created by koreny on 3/20/2017.
  */
 import com.hpe.jc.GherkinProgress;
@@ -6,6 +6,7 @@ import com.hpe.jc.JC;
 import com.hpe.jc.JCPlugin;
 import org.junit.Assert;
 import org.junit.Test;
+import testUtils.LogPlugin;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -450,70 +451,6 @@ public class JCCoreTests {
         };
 
         Assert.assertArrayEquals(expectedFlow, log.log.toArray());
-    }
-
-    class LogPlugin extends JCPlugin {
-
-        public ArrayList<String> log = new ArrayList<>();
-
-
-        @Override
-        protected void onInit() { }
-
-
-        @Override
-        protected void onEndOfAny() {
-
-        }
-
-        @Override
-        protected void onStartOfAny() {
-
-        }
-
-        protected void onFeatureStart() {
-            Assert.assertEquals(progress.getCurrentFeature(), progress.getCurrent());
-            log.add("s"+progress.getCurrentFeature().getDescription());
-        }
-
-        protected void onFeatureEnd() {
-            Assert.assertEquals(progress.getCurrentFeature(), progress.getCurrent());
-            log.add("e"+progress.getCurrentFeature().getDescription());
-
-        }
-
-        protected void onScenarioStart() {
-            Assert.assertEquals(progress.getCurrentScenario(), progress.getCurrent());
-            log.add("s"+progress.getCurrentScenario().getDescription());
-
-        }
-
-        protected void onScenarioEnd() {
-            Assert.assertEquals(progress.getCurrentScenario(), progress.getCurrent());
-            log.add("e"+progress.getCurrentScenario().getDescription());
-
-        }
-
-        protected void onStepStart() {
-            Assert.assertEquals(progress.getCurrentStep(), progress.getCurrent());
-            log.add("s"+progress.getCurrentStep().getDescription());
-
-        }
-
-        protected void onStepEnd() {
-            Assert.assertEquals(progress.getCurrentStep(), progress.getCurrent());
-            log.add("e"+progress.getCurrentStep().getDescription());
-
-        }
-
-        protected void onStepFailure(Throwable ex) {
-            if (progress.getCurrentStep()!=null) {
-                log.add("f"+progress.getCurrentStep().getDescription());
-            } else {
-                log.add("f"+progress.getCurrentScenario().getDescription());
-            }
-
-        }
     }
 
 }

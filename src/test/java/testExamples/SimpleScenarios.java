@@ -1,8 +1,10 @@
+package testExamples;
+
 import com.hpe.jc.JC;
-import com.hpe.jc.plugins.OctaneFormatter.JCOctaneCucumberFormatter;
-import com.hpe.jc.plugins.JCPValidateFlowBy;
 import com.hpe.jc.JCPlugin;
+import com.hpe.jc.plugins.JCPValidateFlowBy;
 import com.hpe.jc.plugins.JCTimePlugin;
+import com.hpe.jc.plugins.OctaneFormatter.JCOctaneCucumberFormatter;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,36 +14,22 @@ import org.junit.Test;
  */
 
 
-public class ExampleTestUsingJC {
+public class SimpleScenarios {
 
     public static JC jc = new JC(
-            ExampleTestUsingJC.class,
-            new JCPlugin[]{new JCPValidateFlowBy("/gherkin2.feature"), new JCOctaneCucumberFormatter(), new JCTimePlugin()},
+            SimpleScenarios.class,
+            new JCPlugin[]{new JCPValidateFlowBy("/gherkin.feature"), new JCOctaneCucumberFormatter(), new JCTimePlugin()},
             "hello world");
-
 
     @Test
     public void myTest() {
         jc.scenario("This is the first scenario", ()->{
 
             jc.given( "I have a scenario");
-            try {
-                Thread.sleep(16);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             jc.when("I run my junit test");
-            try {
-                Thread.sleep(32);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             jc.then("I can do this");
-            try {
-                Thread.sleep(64);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         });
     }
 
