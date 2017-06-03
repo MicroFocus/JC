@@ -9,6 +9,7 @@ public class GherkinFeature extends GherkinBaseEntity {
 
     public ArrayList<GherkinScenario> scenarios = new ArrayList<GherkinScenario>();
     public ArrayList<String> tags = new ArrayList<>();
+    public GherkinBackground background = null;
 
     public GherkinFeature(String featureDescription) {
         super(featureDescription);

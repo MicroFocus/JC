@@ -5,6 +5,7 @@
 package com.hpe.jc;
 
 import com.hpe.jc.errors.GherkinAssert;
+import com.hpe.jc.gherkin.GherkinBackground;
 import com.hpe.jc.gherkin.GherkinFeature;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
@@ -86,15 +87,31 @@ public class JC {
         }
     }
 
-    // todo - implement
+*/
     public void background(String description, Runnable code) {
+        // update progress with scenario
+        GherkinBackground background = new GherkinBackground(description);
+        progress.updateBackground(background);
+
+        // handle running the scenario
         try {
             code.run();
-        } catch (Exception e) {
+        } catch (JCCannotContinueException e) {
+            progress.updateException(e);
             throw e;
+        } catch (Exception | Error e) {
+            progress.updateException(e);
+            throw GherkinAssert.createClearExceptionFrom(e, progress);
+        } finally {
+            // update only if everything is ok
+            //if (!progress.isCurrentScenarioHasException()) {
+            progress.updateBackground(null);
+            //}
+            progress.report();
         }
+
     }
-    */
+
     public void given(String stepDesc) {
         GherkinStep step = new GherkinStep("Given", stepDesc);
         progress.updateStep(step);

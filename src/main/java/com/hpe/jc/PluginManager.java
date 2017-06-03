@@ -50,6 +50,18 @@ public class PluginManager extends JCPlugin {
     }
 
     @Override
+    protected void onBackgroundStart() {
+        run(progress.getCurrent(), (plugin)-> plugin.onStartOfAny());
+        run(progress.getLatestBackground(), (plugin)-> plugin.onBackgroundStart());
+    }
+
+    @Override
+    protected void onBackgroundEnd() {
+        run(progress.getCurrent(), (plugin)-> plugin.onEndOfAny());
+        run(progress.getLatestBackground(), (plugin)-> plugin.onBackgroundEnd());
+    }
+
+    @Override
     protected void onEndOfAny() {
 
     }

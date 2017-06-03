@@ -34,6 +34,16 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
     protected void onInit() { }
 
     @Override
+    protected void onBackgroundStart() {
+
+    }
+
+    @Override
+    protected void onBackgroundEnd() {
+
+    }
+
+    @Override
     protected void onEndOfAny() {
 
     }

@@ -7,9 +7,25 @@ import java.util.ArrayList;
  */
 public class GherkinScenario extends GherkinBaseEntity{
 
-    public GherkinFeature parent;
-
+    private GherkinFeature parent;
+    private GherkinBackground background;
     public ArrayList<GherkinStep> steps = new ArrayList<GherkinStep>();
+
+    public GherkinFeature getParent() {
+        return parent;
+    }
+
+    public GherkinBackground getBackground() {
+        return background;
+    }
+    public void attachBackground(GherkinBackground background) { this.background = background; }
+
+    public void setParent(GherkinFeature parent) {
+        this.parent = parent;
+//        if (parent.background!=null) {
+//            background = parent.background.clone();
+//        }
+    }
 
     public GherkinScenario(String description) {
 
@@ -44,9 +60,15 @@ public class GherkinScenario extends GherkinBaseEntity{
     }
 
     public GherkinScenario clone(GherkinStep extraStep) {
+        GherkinScenario clone = clone();
+        clone.steps.add(extraStep);
+
+        return clone;
+    }
+
+    public GherkinScenario clone() {
         GherkinScenario clone = new GherkinScenario(getDescription());
         clone.steps = (ArrayList<GherkinStep>) steps.clone();
-        clone.steps.add(extraStep);
 
         return clone;
     }
@@ -95,7 +117,7 @@ public class GherkinScenario extends GherkinBaseEntity{
         return code;
     }
 
-    private static String toCamelCase(String s) {
+    protected static String toCamelCase(String s) {
         String result = "";
         for (String part : s.trim().split(" ")) {
             result += part.substring(0,1).toUpperCase() + part.substring(1).toLowerCase();
@@ -111,4 +133,5 @@ public class GherkinScenario extends GherkinBaseEntity{
         }
         return result;
     }
+
 }

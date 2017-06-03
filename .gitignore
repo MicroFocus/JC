@@ -25,4 +25,5 @@ hs_err_pid*
 =======
 .idea
 target
->>>>>>> 6dfa8b3 (contain skeleton of JC framework)
+OctaneGherkinResults.xml
+vardi.iml

@@ -13,4 +13,5 @@ public interface IJCExceptionHolder {
     ArrayList<Throwable> getPluginExceptions();
     ArrayList<Throwable> getTestExceptions();
     ArrayList<Throwable> getFatalExceptions();
+
 }
