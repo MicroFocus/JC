@@ -31,7 +31,7 @@ public class GherkinAssert {
         BACKGROUND_TITLE_MISMATCH,
     }
 
-    public static void BackgroundTitleShouldBeAsInDefinition(GherkinBackground latestBackground, GherkinBackground expectedbackground) {
+    public static void backgroundTitleShouldBeAsInDefinition(GherkinBackground latestBackground, GherkinBackground expectedbackground) {
         if (notTheSame(latestBackground.getDescription(), expectedbackground.getDescription())) {
             String message = String.format(
                     "Your background title is not as defined in the feature file\n" +
@@ -58,7 +58,7 @@ public class GherkinAssert {
         }
     }
 
-    public static void FeatureShouldContainABackground(GherkinFeature expectedFeature, String script) {
+    public static void backgroundShouldNotHaveBeenAttachedIfNotDefined(GherkinFeature expectedFeature, String script) {
         if (expectedFeature.background == null) {
             String message = String.format(
                     "You have used a background in your test code, but your feature file does not have a background defined.\n" +
@@ -68,17 +68,17 @@ public class GherkinAssert {
         }
     }
 
-    public static void SameFeature(GherkinFeature actual, GherkinFeature expected) {
+    public static void featureTitleShouldBeAsInDefinition(GherkinFeature actual, GherkinFeature expected) {
         if (notTheSame(actual.getDescription(), expected.getDescription())) {
-            String message = String.format("" +
+            String message = String.format("\n" +
                     "feature description is not the same as the feature definition file specified. \n" +
-                    "Your feature: \"%s\" \n" +
-                    "Defined feature: \"%s\" \n", actual.getDescription(), expected.getDescription());
+                    "Actual: \"%s\" \n" +
+                    "Expected: \"%s\" \n", actual.getDescription(), expected.getDescription());
             throw createException(message, ERROR_TYPES.FEATURES_MISMATCH);
         }
     }
 
-    public static void BackgroundShouldHaveAllSteps(GherkinBackground expectedBackground, GherkinBackground currentBackground) {
+    public static void backgroundStepsNumberShouldBeAsDefined(GherkinBackground expectedBackground, GherkinBackground currentBackground) {
         int dif = expectedBackground.steps.size() - currentBackground.steps.size();
         if (dif != 0) {
             String message = String.format(
@@ -96,7 +96,7 @@ public class GherkinAssert {
         }
     }
 
-    public static void ScenarioHasAllSteps(GherkinScenario expectedScenario, GherkinScenario currentScenario) {
+    public static void scenarioStepsNumberShouldBeAsDefined(GherkinScenario expectedScenario, GherkinScenario currentScenario) {
         int dif = expectedScenario.steps.size() - currentScenario.steps.size();
         if (dif != 0) {
             String message = String.format(
@@ -111,7 +111,7 @@ public class GherkinAssert {
         }
     }
 
-    public static GherkinScenario featureContainsScenario(GherkinFeature featureDefinition, GherkinScenario actualScenario) {
+    public static GherkinScenario featureShouldContainTheFollowingScenario(GherkinFeature featureDefinition, GherkinScenario actualScenario) {
         // find scenario
         GherkinScenario result = null;
         for (GherkinScenario scenario : featureDefinition.scenarios) {
@@ -149,20 +149,31 @@ public class GherkinAssert {
                             "your scenario should be: \n\n%s\n" +
                             "But it looks like that: \n\n%s\n",
                     linkToScenarioDefinition.printScenario(),
-                    progress.getCurrentScenario().clone(progress.getCurrentStep()).printScenario(), "EXTRA STEP");
+                    progress.getCurrentScenario().clone(progress.getCurrentStep()).printScenario( "EXTRA STEP"));
             throw createException(message, ERROR_TYPES.STEP_TOO_MANY);
         }
     }
 
-    public static void nextStepIsAsExpected(GherkinProgress progress, GherkinScenario linkToScenarioDefinition, GherkinStep expectedNextStep) {
-        if (notTheSame(progress.getCurrentStep().type, expectedNextStep.type) ||
-                notTheSame(progress.getCurrentStep().getDescription(), expectedNextStep.getDescription())) {
-            String message = String.format(
-                    "The step is not identical to the expected type: \n" +
-                    "your scenario should be: \n\n%s\n" +
-                    "But it looks like that: \n\n%s\n",
-                    linkToScenarioDefinition.printScenario(),
-                    progress.getCurrentScenario().printScenario(), "WRONG STEP TYPE");
+    public static void nextStepTitleIsAsExpected(GherkinProgress progress, GherkinScenario linkToScenarioDefinition, GherkinStep expectedNextStep) {
+        if (notTheSame(progress.getCurrentStep().getDescription(), expectedNextStep.getDescription())) {
+            String message = String.format("\n" +
+                    "We found a mismatch in one of your steps title: \n" +
+                    "Actual: \n\n%s\n" +
+                    "Expected: \n\n%s\n",
+                    progress.getCurrentScenario().clone(progress.getCurrentStep()).printScenario( "WRONG STEP TITLE"),
+                    linkToScenarioDefinition.printScenario());
+            throw createException(message, ERROR_TYPES.STEP_MISMATCH);
+        }
+    }
+
+    public static void nextStepTypeIsAsExpected(GherkinProgress progress, GherkinScenario linkToScenarioDefinition, GherkinStep expectedNextStep) {
+        if (notTheSame(progress.getCurrentStep().type, expectedNextStep.type)) {
+            String message = String.format("\n" +
+                "We found a mismatch in one of your steps type: \n" +
+                "Actual: \n\n%s\n" +
+                "Expected: \n\n%s\n",
+                progress.getCurrentScenario().clone(progress.getCurrentStep()).printScenario( "WRONG STEP TYPE"),
+                linkToScenarioDefinition.printScenario());
             throw createException(message, ERROR_TYPES.STEP_MISMATCH);
         }
     }
@@ -199,10 +210,18 @@ public class GherkinAssert {
         // let's fill this with forgotten steps...
         ArrayList<GherkinScenario> scenariosToImplement = new ArrayList<>();
 
-        int scenarioDif = featureFile.scenarios.size() - progress.getCurrentFeature().scenarios.size();
+        // #scenarios on feature file = #actual scenarios + #failed backgrounds
+        int scenarioDif = featureFile.scenarios.size() - progress.getCurrentFeature().scenarios.size() - progress.getCurrentFeature().orphanBackgrounds.size();
+
         // forgot to implement some steps from within the feature definition
         if (scenarioDif > 0) {
-            String message = String.format("You forgot to implement %s steps:\n", String.valueOf(scenarioDif));
+            if (progress.getCurrentFeature().orphanBackgrounds.size()>0) {
+                // wierd edge case where user forgot to implement a scenario and also background failed
+                // so I have no idea which is the missing scenario vs. the scenario with the failed background.
+                // decided to not do anything since user will get an error of his failed background, when he fixes the error, he will get this one...
+                return;
+            }
+            String message = String.format("\nYou forgot to implement %s scenarios:\n", String.valueOf(scenarioDif));
             for (GherkinScenario scenarioDef : featureFile.scenarios) {
                 if (!file2actual.containsKey(scenarioDef)) {
                     scenariosToImplement.add(scenarioDef);

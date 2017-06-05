@@ -101,7 +101,6 @@ public class JCPValidateFlowBy extends JCPlugin {
     @Override
     protected void onInit() {
         // load and parse gherkin script
-
         expectedScript = readGherkinScript(progress.getTestObject(), featureFileLocation);
         expectedFeature = parseGherkinScript(expectedScript);
     }
@@ -109,10 +108,8 @@ public class JCPValidateFlowBy extends JCPlugin {
 
     @Override
     protected void onBackgroundStart() {
-        //expectedScenario = GherkinAssert.featureContainsScenario(expectedFeature, progress.getCurrentScenario());
-        //expectedScenarioToActualMap.put(expectedScenario, progress.getCurrentScenario());
-        GherkinAssert.FeatureShouldContainABackground(expectedFeature, expectedScript);
-        GherkinAssert.BackgroundTitleShouldBeAsInDefinition(progress.getLatestBackground(), expectedFeature.background);
+        GherkinAssert.backgroundShouldNotHaveBeenAttachedIfNotDefined(expectedFeature, expectedScript);
+        GherkinAssert.backgroundTitleShouldBeAsInDefinition(progress.getLatestBackground(), expectedFeature.background);
         expectedScenario = expectedFeature.background;
         expectedStep = null;
     }
@@ -125,7 +122,7 @@ public class JCPValidateFlowBy extends JCPlugin {
 
         // if there were exceptions - no point checking scenario, as it most probably didn't run.
         if (noMeaningfulExceptions) {
-            GherkinAssert.BackgroundShouldHaveAllSteps(expectedFeature.background, progress.getLatestBackground());
+            GherkinAssert.backgroundStepsNumberShouldBeAsDefined(expectedFeature.background, progress.getLatestBackground());
         }
         expectedScenario = null;
     }
@@ -145,7 +142,7 @@ public class JCPValidateFlowBy extends JCPlugin {
         progress.getCurrentFeature().setData(this.getClass(), EXPECTED_SCRIPT, expectedScript);
         progress.getCurrentFeature().setData(this.getClass(), SCRIPT_URL, featureFileLocation);
 
-        GherkinAssert.SameFeature(expectedFeature, progress.getCurrentFeature());
+        GherkinAssert.featureTitleShouldBeAsInDefinition(progress.getCurrentFeature(), expectedFeature);
     }
 
     protected void onFeatureEnd() {
@@ -155,7 +152,7 @@ public class JCPValidateFlowBy extends JCPlugin {
     }
 
     protected void onScenarioStart() {
-        expectedScenario = GherkinAssert.featureContainsScenario(expectedFeature, progress.getCurrentScenario());
+        expectedScenario = GherkinAssert.featureShouldContainTheFollowingScenario(expectedFeature, progress.getCurrentScenario());
         GherkinAssert.backgroundShouldHaveBeenAttachedIfDefined(progress.getCurrentScenario(), expectedScenario);
         expectedScenarioToActualMap.put(expectedScenario, progress.getCurrentScenario());
         expectedStep = null;
@@ -168,7 +165,7 @@ public class JCPValidateFlowBy extends JCPlugin {
 
         // if there were exceptions - no point checking scenario, as it most probably didn't run.
         if (noMeaningfulExceptions) {
-            GherkinAssert.ScenarioHasAllSteps(expectedScenario, progress.getCurrentScenario());
+            GherkinAssert.scenarioStepsNumberShouldBeAsDefined(expectedScenario, progress.getCurrentScenario());
         }
         expectedScenario = null;
     }
@@ -183,7 +180,8 @@ public class JCPValidateFlowBy extends JCPlugin {
         expectedStepToActualMap.put(expectedStep, progress.getCurrentStep());
 
         // now validating correct actual step
-        GherkinAssert.nextStepIsAsExpected(progress, expectedScenario, expectedStep);
+        GherkinAssert.nextStepTitleIsAsExpected(progress, expectedScenario, expectedStep);
+        GherkinAssert.nextStepTypeIsAsExpected(progress, expectedScenario, expectedStep);
 
         // update link if everything is ok
         this.expectedStep = expectedStep;

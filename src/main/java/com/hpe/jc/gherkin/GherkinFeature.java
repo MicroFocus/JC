@@ -11,6 +11,10 @@ public class GherkinFeature extends GherkinBaseEntity {
     public ArrayList<String> tags = new ArrayList<>();
     public GherkinBackground background = null;
 
+    // used to store backgrounds that threw exception and their scenario never started to run...
+    public ArrayList<GherkinBackground> orphanBackgrounds = new ArrayList<>();
+
+
     public GherkinFeature(String featureDescription) {
         super(featureDescription);
     }

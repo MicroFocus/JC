@@ -9,6 +9,19 @@ import java.util.List;
 
 /**
  * Created by koreny on 3/24/2017.
+ *
+ * This is a lexer that creates the expected feature structure from the feature definition file.
+ * The expected feature will be compared to the actual feature structure by the JCPValidateFlowBy plugin so we can point out differences
+ * Structure is:
+ * - feature
+ *   + background
+ *     - steps
+ *   + Scenarios
+ *     - Steps
+ *
+ * The expected and actual feature have identical structure except 1 thing - the background:
+ * The expected has 1 copy of the background at the feature level.
+ * The actual has a copy of the background for each scenario (because it saves exception information that could be different between background runs)
  */
 public class GherkinLexerListener implements Listener {
 
@@ -37,12 +50,11 @@ public class GherkinLexerListener implements Listener {
     public void scenario(String element, String title, String description, Integer integer) {
         GherkinScenario scenario = new GherkinScenario(title);
 
+        scenario.setParent(currentFeature);
+        scenario.attachBackground(currentFeature.background);
         currentFeature.scenarios.add(scenario);
-        currentScenario = scenario;
-        if (background != null) {
-            currentScenario.attachBackground(background.clone());
-        }
 
+        currentScenario = scenario;
     }
 
     public void scenarioOutline(String s, String s1, String s2, Integer integer) {

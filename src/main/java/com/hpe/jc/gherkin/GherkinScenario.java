@@ -22,9 +22,6 @@ public class GherkinScenario extends GherkinBaseEntity{
 
     public void setParent(GherkinFeature parent) {
         this.parent = parent;
-//        if (parent.background!=null) {
-//            background = parent.background.clone();
-//        }
     }
 
     public GherkinScenario(String description) {
