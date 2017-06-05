@@ -18,8 +18,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.FileOutputStream;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -97,7 +95,7 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
     }
 
     private HashMap<GherkinScenario, GherkinScenario> scenarioMap;
-    private HashMap<GherkinStep, GherkinStep> stepMap;
+    private HashMap<GherkinStep, GherkinStep> expected2actualMap;
 
     public void writeXMLResult() {
         // generate empty document
@@ -114,9 +112,9 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
 
         GherkinFeature expectedFeature = JCPValidateFlowBy.getExpectedFeature(progress.getCurrentFeature());
         scenarioMap = JCPValidateFlowBy.getExpectedToActualScenarioMap(progress.getCurrentFeature());
-        stepMap = JCPValidateFlowBy.getExpectedToActualStepMap(progress.getCurrentFeature());
+        expected2actualMap = JCPValidateFlowBy.getExpectedToActualStepMap(progress.getCurrentFeature());
 
-        boolean isDefFileMissing = expectedFeature == null || scenarioMap==null || stepMap==null;
+        boolean isDefFileMissing = expectedFeature == null || scenarioMap==null || expected2actualMap ==null;
         if (isDefFileMissing) {
             throw new JCException(String.format("%s plugin is missing. It is needed to generate an octane XML result", JCPValidateFlowBy.class.toString()));
         }
@@ -177,8 +175,8 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
         */
 
         // Serializing the scenarios
-        for (GherkinScenario scenario : expectedFeature.scenarios) {
-            scenariosElement.appendChild(getXMLForScenario(scenario, doc));
+        for (GherkinScenario expectedScenario : expectedFeature.scenarios) {
+            scenariosElement.appendChild(getXMLForScenario(expectedScenario, doc));
         }
 
         feature.appendChild(scenariosElement);
@@ -186,22 +184,26 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
         return feature;
     }
 
-    public Element getXMLForScenario(GherkinScenario jcscenario, Document doc) {
-        // Adding the feature members
+    public Element getXMLForScenario(GherkinScenario expectedScenario, Document doc) {
+        // Adding the scenario members
         Element scenario = doc.createElement(SCENARIO_TAG_NAME);
-        scenario.setAttribute("name", jcscenario.getDescription());
-        /*** scenario outline - not supported yet
-        if(_outlineIndex>0){
-            scenario.setAttribute("outlineIndex", _outlineIndex.toString());
-        }
-        */
-        // Serializing the steps
+        scenario.setAttribute("name", expectedScenario.getDescription());
+
         Element steps = doc.createElement(STEPS_TAG_NAME);
-        for (GherkinStep jcstep : jcscenario.steps) {
-            steps.appendChild(getXMLForStep(jcstep, stepMap.get(jcstep), doc));
+        scenario.appendChild(steps);
+
+        // add background steps
+        // todo: need to solve serious issue: expected have 1 copy of background with 1 copy of each step. problem. expected2actual can't help us find the actual in this case...
+        if (expectedScenario.getParent().background != null) {
+            for (GherkinStep expectedStep : expectedScenario.getParent().background.steps) {
+                steps.appendChild(getXMLForStep(expectedStep, expected2actualMap.get(expectedStep), doc));
+            }
         }
 
-        scenario.appendChild(steps);
+        // add scenario steps
+        for (GherkinStep expectedStep : expectedScenario.steps) {
+            steps.appendChild(getXMLForStep(expectedStep, expected2actualMap.get(expectedStep), doc));
+        }
 
         return scenario;
     }
@@ -230,13 +232,13 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
             step.setAttribute("status", numOfErrors > 0 ? "failed" : "passed");
             step.setAttribute("duration", String.valueOf(duration));
             for (Throwable ex : actualStep.getTestExceptions()) {
-                errorMessages += ex.getMessage() + "\n\n";
+                errorMessages += ex.toString() + "\n\n";
             }
             for (Throwable ex : actualStep.getFatalExceptions()) {
-                errorMessages += ex.getMessage() + "\n\n";
+                errorMessages += ex.toString() + "\n\n";
             }
             for (Throwable ex : actualStep.getPluginExceptions()) {
-                errorMessages += ex.getMessage() + "\n\n";
+                errorMessages += ex.toString() + "\n\n";
             }
         }
 
