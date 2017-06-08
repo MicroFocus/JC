@@ -25,7 +25,7 @@ public class TestScenarioWithBackground {
     public static int counter;
     @Before
     public void background() {
-        jc.background("hello background", ()-> {
+        jc.background(()-> {
             counter++;
             jc.given("I am logged in");
             jc.and("I have 3 tests");

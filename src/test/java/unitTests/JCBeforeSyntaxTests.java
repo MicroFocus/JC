@@ -15,7 +15,7 @@ public class JCBeforeSyntaxTests {
     public void TestBasicFlow() {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
-        jc.background("00", ()->{
+        jc.background(()->{
             jc.given("001");
             jc.when("002");
             jc.then("003");
@@ -26,7 +26,7 @@ public class JCBeforeSyntaxTests {
             jc.when("112");
             jc.then("113");
         });
-        jc.background("00", ()->{
+        jc.background(()->{
             jc.given("001");
             jc.when("002");
             jc.then("003");
@@ -41,15 +41,13 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
             "s1",
-                "s00",
+                "s11",
                     "s001",
                     "e001",
                     "s002",
                     "e002",
                     "s003",
                     "e003",
-                "e00",
-                "s11",
                     "s111",
                     "e111",
                     "s112",
@@ -57,15 +55,13 @@ public class JCBeforeSyntaxTests {
                     "s113",
                     "e113",
                 "e11",
-                "s00",
+                "s12",
                     "s001",
                     "e001",
                     "s002",
                     "e002",
                     "s003",
                     "e003",
-                "e00",
-                "s12",
                     "s121",
                     "e121",
                     "s122",
@@ -83,12 +79,17 @@ public class JCBeforeSyntaxTests {
     public void TestExceptionAfter00() {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
+        final ArrayList<Object> bool = new ArrayList<>();
         try {
-            jc.background("00", ()-> {
-                if (true == true) throw new RuntimeException("error");
+            jc.background(()-> {
+                if (bool.size()==0) {
+                    bool.add(new Object());
+                    throw new RuntimeException("Error");
+                }
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
+
             });
 
             jc.scenario("11", ()->{
@@ -99,7 +100,7 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
+            jc.background(()->{
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
@@ -118,18 +119,16 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                    "s00",
-                    "f00",
-                    "e00",
-                    "s00",
+                    "s11",
+                    "f11",
+                    "e11",
+                    "s12",
                         "s001",
                         "e001",
                         "s002",
                         "e002",
                         "s003",
                         "e003",
-                    "e00",
-                    "s12",
                         "s121",
                         "e121",
                         "s122",
@@ -148,11 +147,16 @@ public class JCBeforeSyntaxTests {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background("00", ()-> {
+            final ArrayList<Object> bool = new ArrayList<>();
+            jc.background(()-> {
                 jc.given("001");
-                if (true == true) throw new RuntimeException("error");
+                if (bool.size()==0) {
+                    bool.add(new Object());
+                    throw new RuntimeException("error");
+                }
                 jc.when("002");
                 jc.then("003");
+
             });
 
             jc.scenario("11", ()->{
@@ -163,12 +167,6 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
-
-            });
 
             jc.scenario("12", ()-> {
                 jc.given("121");
@@ -182,20 +180,18 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                "s00",
+                "s11",
                 "s001",
                 "f001",
                 "e001",
-                "e00",
-                "s00",
+                "e11",
+                "s12",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s12",
                 "s121",
                 "e121",
                 "s122",
@@ -214,11 +210,16 @@ public class JCBeforeSyntaxTests {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background("00", ()-> {
+            final ArrayList<Object> bool = new ArrayList<>();
+            jc.background(()-> {
                 jc.given("001");
                 jc.when("002");
-                if (true == true) throw new RuntimeException("error");
+                if (bool.size()==0) {
+                    bool.add(new Object());
+                    throw new RuntimeException("error");
+                }
                 jc.then("003");
+
             });
 
             jc.scenario("11", ()->{
@@ -229,12 +230,6 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
-
-            });
 
             jc.scenario("12", ()-> {
                 jc.given("121");
@@ -248,22 +243,20 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                "s00",
+                "s11",
                 "s001",
                 "e001",
                 "s002",
                 "f002",
                 "e002",
-                "e00",
-                "s00",
+                "e11",
+                "s12",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s12",
                 "s121",
                 "e121",
                 "s122",
@@ -282,11 +275,16 @@ public class JCBeforeSyntaxTests {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background("00", ()-> {
+            final ArrayList<Object> bool = new ArrayList<>();
+            jc.background(()-> {
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
-                if (true == true) throw new RuntimeException("error");
+                if (bool.size()==0) {
+                    bool.add(new Object());
+                    throw new RuntimeException("error");
+                }
+
             });
 
             jc.scenario("11", ()->{
@@ -297,12 +295,6 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
-
-            });
 
             jc.scenario("12", ()-> {
                 jc.given("121");
@@ -316,7 +308,7 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                "s00",
+                "s11",
                 "s001",
                 "e001",
                 "s002",
@@ -324,16 +316,14 @@ public class JCBeforeSyntaxTests {
                 "s003",
                 "f003",
                 "e003",
-                "e00",
-                "s00",
+                "e11",
+                "s12",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s12",
                 "s121",
                 "e121",
                 "s122",
@@ -352,7 +342,7 @@ public class JCBeforeSyntaxTests {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background("00", ()-> {
+            jc.background(()-> {
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
@@ -367,7 +357,7 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
+            jc.background(()->{
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
@@ -386,28 +376,24 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                "s00",
+                "s11",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s11",
                 "s111",
                 "f111",
                 "e111",
                 "e11",
-                "s00",
+                "s12",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s12",
                 "s121",
                 "e121",
                 "s122",
@@ -425,11 +411,18 @@ public class JCBeforeSyntaxTests {
     public void TestExceptionInBackgroundSecondTime() {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
+
+        final ArrayList<Object> bool = new ArrayList<>();
         try {
-            jc.background("00", ()-> {
+            jc.background(()-> {
                 jc.given("001");
-                jc.when("002");
+                if (bool.size()>0) {
+                    throw new RuntimeException("Error");
+                } else {
+                    jc.when("002");
+                }
                 jc.then("003");
+                bool.add(new Object());
             });
 
             jc.scenario("11", ()->{
@@ -440,9 +433,8 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
+            jc.background(()->{
                 jc.given("001");
-                if (true == true) throw new RuntimeException("error");
                 jc.when("002");
                 jc.then("003");
 
@@ -460,15 +452,13 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                "s00",
+                "s11",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s11",
                 "s111",
                 "e111",
                 "s112",
@@ -476,11 +466,11 @@ public class JCBeforeSyntaxTests {
                 "s113",
                 "e113",
                 "e11",
-                "s00",
+                "s12",
                 "s001",
                 "f001",
                 "e001",
-                "e00",
+                "e12",
                 "e1",
         };
 
@@ -492,7 +482,7 @@ public class JCBeforeSyntaxTests {
         LogPlugin log = new LogPlugin();
         JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background("00", ()-> {
+            jc.background(()-> {
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
@@ -506,7 +496,7 @@ public class JCBeforeSyntaxTests {
         } catch (Throwable e) {}
 
         try {
-            jc.background("00", ()->{
+            jc.background(()->{
                 jc.given("001");
                 jc.when("002");
                 jc.then("003");
@@ -526,15 +516,13 @@ public class JCBeforeSyntaxTests {
 
         String[] expectedFlow = new String[] {
                 "s1",
-                "s00",
+                "s11",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s11",
                 "s111",
                 "e111",
                 "s112",
@@ -542,15 +530,13 @@ public class JCBeforeSyntaxTests {
                 "s113",
                 "e113",
                 "e11",
-                "s00",
+                "s12",
                 "s001",
                 "e001",
                 "s002",
                 "e002",
                 "s003",
                 "e003",
-                "e00",
-                "s12",
                 "s121",
                 "f121",
                 "e121",

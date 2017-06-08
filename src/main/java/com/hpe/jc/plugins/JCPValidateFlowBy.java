@@ -106,26 +106,6 @@ public class JCPValidateFlowBy extends JCPlugin {
     }
 
 
-    @Override
-    protected void onBackgroundStart() {
-        GherkinAssert.backgroundShouldNotHaveBeenAttachedIfNotDefined(expectedFeature, expectedScript);
-        GherkinAssert.backgroundTitleShouldBeAsInDefinition(progress.getLatestBackground(), expectedFeature.background);
-        expectedScenario = expectedFeature.background;
-        expectedStep = null;
-    }
-
-    @Override
-    protected void onBackgroundEnd() {
-        boolean noMeaningfulExceptions =
-                progress.getCurrentScenario().getFatalExceptions().size()==0 &&
-                progress.getCurrentScenario().getTestExceptions().size()==0;
-
-        // if there were exceptions - no point checking scenario, as it most probably didn't run.
-        if (noMeaningfulExceptions) {
-            GherkinAssert.backgroundStepsNumberShouldBeAsDefined(expectedFeature.background, progress.getLatestBackground());
-        }
-        expectedScenario = null;
-    }
 
     @Override
     protected void onEndOfAny() {
@@ -150,11 +130,50 @@ public class JCPValidateFlowBy extends JCPlugin {
         progress.getCurrentFeature().setData(this.getClass(), EXPECTED_TO_ACTUAL_STEP_MAP, expectedStepToActualMap);
         GherkinAssert.sameNumberOfScenarios(expectedFeature, progress, expectedScenarioToActualMap);
     }
+//
+//    @Override
+//    protected void onBackgroundStart() {
+//        GherkinAssert.backgroundShouldNotHaveBeenAttachedIfNotDefined(expectedFeature, expectedScript);
+//
+//        // background indexes of actual and expected are equal (design decision)
+//        int indexOfCurrentBackground = progress.getCurrentFeature().backgrounds.size()-1;
+//        GherkinBackground expectedBackground = expectedFeature.backgrounds.get(indexOfCurrentBackground);
+//
+//        GherkinAssert.backgroundTitleShouldBeAsInDefinition(progress.getLatestBackground(), expectedBackground);
+//        expectedScenario = expectedBackground;
+//        expectedStep = null;
+//    }
+//
+//    @Override
+//    protected void onBackgroundEnd() {
+//        boolean noMeaningfulExceptions =
+//                progress.getCurrentScenario().getFatalExceptions().size()==0 &&
+//                progress.getCurrentScenario().getTestExceptions().size()==0;
+//
+//        // if there were exceptions - no point checking scenario, as it most probably didn't run.
+//        if (noMeaningfulExceptions) {
+//            GherkinAssert.backgroundStepsNumberShouldBeAsDefined(expectedScenario, progress.getLatestBackground());
+//        }
+//        expectedScenario = null;
+//    }
 
     protected void onScenarioStart() {
-        expectedScenario = GherkinAssert.featureShouldContainTheFollowingScenario(expectedFeature, progress.getCurrentScenario());
-        GherkinAssert.backgroundShouldHaveBeenAttachedIfDefined(progress.getCurrentScenario(), expectedScenario);
-        expectedScenarioToActualMap.put(expectedScenario, progress.getCurrentScenario());
+        GherkinFeature currentFeature = progress.getCurrentFeature();
+        GherkinScenario currentScenario = progress.getCurrentScenario();
+
+        expectedScenario = GherkinAssert.featureShouldContainTheFollowingScenario(expectedFeature, currentScenario);
+        expectedScenarioToActualMap.put(expectedScenario, currentScenario);
+
+//        if (currentFeature.isBackgroundDefined()) {
+//
+//            //todo: assert if we have an index issue
+//
+//            // find matching expected background and attach it to expected scenario
+//            GherkinBackground expectedBackground = currentFeature.findBackgroundwithSameIndexFrom(expectedFeature, currentScenario.getBackground());
+//            expectedBackground.parentScenario = expectedScenario;
+//            expectedScenario.attachBackground(expectedBackground);
+//        }
+
         expectedStep = null;
     }
 

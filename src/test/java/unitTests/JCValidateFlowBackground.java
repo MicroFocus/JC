@@ -48,7 +48,7 @@ public class JCValidateFlowBackground {
         ValidateMock validate = new ValidateMock(script);
         JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-        jc.background("10", () -> {
+        jc.background(() -> {
             jc.given("101");
             jc.and("102");
             jc.but("103");
@@ -58,7 +58,7 @@ public class JCValidateFlowBackground {
             jc.when("112");
             jc.then("113");
         });
-        jc.background("10", () -> {
+        jc.background(() -> {
             jc.given("101");
             jc.and("102");
             jc.but("103");
@@ -74,7 +74,7 @@ public class JCValidateFlowBackground {
     @Test
     public void TestBackgroundIsMissing() {
 
-        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.BACKGROUND_MISSING;
+        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_MISMATCH;
         try {
             ValidateMock validate = new ValidateMock(script);
             JC jc = new JC(this, new JCPlugin[]{validate}, "1");
@@ -84,7 +84,7 @@ public class JCValidateFlowBackground {
                 jc.when("112");
                 jc.then("113");
             });
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
                 jc.and("102");
                 jc.but("103");
@@ -106,12 +106,12 @@ public class JCValidateFlowBackground {
     @Test
     public void TestBackgroundIsUsedButNotNeededAsItIsNotDeclaredInFeatureFile() {
 
-        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.BACKGROUND_IS_NOT_EXPECTED;
+        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_MISMATCH;
         try {
             ValidateMock validate = new ValidateMock(scriptWithoutBackground);
             JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
                 jc.and("102");
                 jc.but("103");
@@ -121,44 +121,7 @@ public class JCValidateFlowBackground {
                 jc.when("112");
                 jc.then("113");
             });
-            jc.background("10", () -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
-            });
-            jc.scenario("12", () -> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
-            });
-            jc.finished();
-        } catch (JCCannotContinueException ex) {
-            Assert.assertEquals(ex.errorId, expectedId);
-            return;
-        }
-
-        throw new RuntimeException("Got no error, expected error with ID " + expectedId.toString());
-    }
-
-    @Test
-    public void TestBackgroundTitleMismatch() {
-
-        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.BACKGROUND_TITLE_MISMATCH;
-        try {
-            ValidateMock validate = new ValidateMock(script);
-            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-            jc.background("", () -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
-            });
-            jc.scenario("11", () -> {
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
-            });
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
                 jc.and("102");
                 jc.but("103");
@@ -185,9 +148,9 @@ public class JCValidateFlowBackground {
             ValidateMock validate = new ValidateMock(script);
             JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
-                jc.and("102");
+                jc.and("error");
                 jc.but("103");
             });
             jc.scenario("11", () -> {
@@ -195,11 +158,7 @@ public class JCValidateFlowBackground {
                 jc.when("112");
                 jc.then("113");
             });
-            jc.background("10", () -> {
-                jc.given("101");
-                jc.and("error");
-                jc.but("103");
-            });
+
             jc.scenario("12", () -> {
                 jc.given("121");
                 jc.when("122");
@@ -220,7 +179,7 @@ public class JCValidateFlowBackground {
         ValidateMock validate = new ValidateMock(script);
         JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-        jc.background("10", () -> {
+        jc.background(() -> {
             jc.given("101");
             if (true==true) throw new RuntimeException("oops!");
             jc.and("102");
@@ -232,7 +191,7 @@ public class JCValidateFlowBackground {
             jc.when("112");
             jc.then("113");
         });
-        jc.background("10", () -> {
+        jc.background(() -> {
             jc.given("101");
             jc.and("102");
             jc.but("103");
@@ -246,14 +205,12 @@ public class JCValidateFlowBackground {
     }
 
     @Test
-    public void TestScenarioAfterBackgroundIsMissing() {
+    public void TestBackgroundCanBeDeclaredOnlyOnce() {
 
-        GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.BACKGROUND_MISSING;
-        try {
             ValidateMock validate = new ValidateMock(script);
             JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
                 jc.and("102");
                 jc.but("103");
@@ -269,12 +226,7 @@ public class JCValidateFlowBackground {
                 jc.then("123");
             });
             jc.finished();
-        } catch (JCCannotContinueException ex) {
-            Assert.assertEquals(ex.errorId, expectedId);
-            return;
-        }
 
-        throw new RuntimeException("Got no error, expected error with ID " + expectedId.toString());
     }
 
     @Test(expected = JCException.class)
@@ -283,7 +235,7 @@ public class JCValidateFlowBackground {
         ValidateMock validate = new ValidateMock(script);
         JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-        jc.background("10", () -> {
+        jc.background(() -> {
             jc.given("101");
             jc.and("102");
             jc.but("103");
@@ -296,7 +248,7 @@ public class JCValidateFlowBackground {
             jc.then("113");
         });
 
-        jc.background("10", () -> {
+        jc.background(() -> {
             jc.given("101");
             jc.and("102");
             jc.but("103");
@@ -318,7 +270,7 @@ public class JCValidateFlowBackground {
             ValidateMock validate = new ValidateMock(script);
             JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
                 jc.and("102");
                 jc.but("103");
@@ -328,7 +280,7 @@ public class JCValidateFlowBackground {
                 jc.when("error");
                 jc.then("113");
             });
-            jc.background("10", () -> {
+            jc.background(() -> {
                 jc.given("101");
                 jc.and("102");
                 jc.but("103");

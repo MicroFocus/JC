@@ -24,49 +24,44 @@ public class GherkinAssert {
         SCENARIO_NULL,
         STEP_TOO_MANY,
         STEP_TOO_FEW,
-        STEP_TOO_FEW_IN_BACKGROUND,
         STEP_MISMATCH,
-        BACKGROUND_MISSING,
-        BACKGROUND_IS_NOT_EXPECTED,
-        BACKGROUND_TITLE_MISMATCH,
     }
+//
+//    public static void backgroundTitleShouldBeAsInDefinition(GherkinBackground latestBackground, GherkinBackground expectedbackground) {
+//        if (notTheSame(latestBackground.getDescription(), expectedbackground.getDescription())) {
+//            String message = String.format(
+//                    "Your background title is not as defined in the feature file\n" +
+//                            "Your background title is: \"%s\"\n" +
+//                            "The background defined in the feature file is \"%s\"\n",
+//                    latestBackground.getDescription(),
+//                    expectedbackground.getDescription());
+//
+//            throw createException(message, ERROR_TYPES.BACKGROUND_TITLE_MISMATCH);
+//        }
+//    }
 
-    public static void backgroundTitleShouldBeAsInDefinition(GherkinBackground latestBackground, GherkinBackground expectedbackground) {
-        if (notTheSame(latestBackground.getDescription(), expectedbackground.getDescription())) {
-            String message = String.format(
-                    "Your background title is not as defined in the feature file\n" +
-                            "Your background title is: \"%s\"\n" +
-                            "The background defined in the feature file is \"%s\"\n",
-                    latestBackground.getDescription(),
-                    expectedbackground.getDescription());
+//    public static void shouldBeMatchingNumberOfScenariosToBackgrounds(GherkinProgress progress, int scenarioCounter, int backgroundCounter) {
+//        // total # backgrounds = scenarios + failed background
+//        if (backgroundCounter != scenarioCounter + progress.getCurrentFeature().getNumberOfFailedBackgrounds()) {
+//            String message = String.format(
+//                            "The following scenario ran without running it's background first.\n" +
+//                            "Scenario is:\n\n%s",
+//                    progress.getCurrentScenario().printScenario());
+//
+//            throw createException(message, ERROR_TYPES.BACKGROUND_MISSING);
+//
+//        }
+//    }
 
-            throw createException(message, ERROR_TYPES.BACKGROUND_TITLE_MISMATCH);
-        }
-    }
-
-    public static void backgroundShouldHaveBeenAttachedIfDefined(GherkinScenario currentScenario, GherkinScenario expectedScenario) {
-        if (expectedScenario.getBackground()!=null && currentScenario.getBackground()==null) {
-            String message = String.format(
-                            "You have not used a background in your test code, but your feature file have a background defined.\n" +
-                            "Your background should look like this: \n%s" +
-                            "You can copy the following code to your \'before test\' method: %s",
-                    expectedScenario.getBackground().printScenario(),
-                    expectedScenario.getBackground().printScenarioCode());
-
-            throw createException(message, ERROR_TYPES.BACKGROUND_MISSING);
-
-        }
-    }
-
-    public static void backgroundShouldNotHaveBeenAttachedIfNotDefined(GherkinFeature expectedFeature, String script) {
-        if (expectedFeature.background == null) {
-            String message = String.format(
-                    "You have used a background in your test code, but your feature file does not have a background defined.\n" +
-                    "Here is your feature file which does not contain a background definition:\n %s",
-                    script);
-            throw createException(message, ERROR_TYPES.BACKGROUND_IS_NOT_EXPECTED);
-        }
-    }
+//    public static void backgroundShouldNotHaveBeenAttachedIfNotDefined(GherkinFeature expectedFeature, String script) {
+//        if (!expectedFeature.isBackgroundDefined()) {
+//            String message = String.format(
+//                    "You have used a background in your test code, but your feature file does not have a background defined.\n" +
+//                    "Here is your feature file which does not contain a background definition:\n %s",
+//                    script);
+//            throw createException(message, ERROR_TYPES.BACKGROUND_IS_NOT_EXPECTED);
+//        }
+//    }
 
     public static void featureTitleShouldBeAsInDefinition(GherkinFeature actual, GherkinFeature expected) {
         if (notTheSame(actual.getDescription(), expected.getDescription())) {
@@ -78,23 +73,23 @@ public class GherkinAssert {
         }
     }
 
-    public static void backgroundStepsNumberShouldBeAsDefined(GherkinBackground expectedBackground, GherkinBackground currentBackground) {
-        int dif = expectedBackground.steps.size() - currentBackground.steps.size();
-        if (dif != 0) {
-            String message = String.format(
-                    "You seems to have missing %s steps that are defined in your background definition: \n" +
-                            "your background should be: \n\n%s\n" +
-                            "But it looks like that: \n\n%s\n",
-                    String.valueOf(dif),
-                    expectedBackground.
-                            printScenario(),
-                    currentBackground.
-                            clone(new GherkinStep("X", "")).
-                            printScenario(String.format("MISSING %d STEPS", dif)));
-
-            throw createException(message, ERROR_TYPES.STEP_TOO_FEW_IN_BACKGROUND);
-        }
-    }
+//    public static void backgroundStepsNumberShouldBeAsDefined(GherkinScenario expectedBackground, GherkinBackground currentBackground) {
+//        int dif = expectedBackground.steps.size() - currentBackground.steps.size();
+//        if (dif != 0) {
+//            String message = String.format(
+//                    "You seems to have missing %s steps that are defined in your background definition: \n" +
+//                            "your background should be: \n\n%s\n" +
+//                            "But it looks like that: \n\n%s\n",
+//                    String.valueOf(dif),
+//                    expectedBackground.
+//                            printScenario(),
+//                    currentBackground.
+//                            clone(new GherkinStep("X", "")).
+//                            printScenario(String.format("MISSING %d STEPS", dif)));
+//
+//            throw createException(message, ERROR_TYPES.STEP_TOO_FEW_IN_BACKGROUND);
+//        }
+//    }
 
     public static void scenarioStepsNumberShouldBeAsDefined(GherkinScenario expectedScenario, GherkinScenario currentScenario) {
         int dif = expectedScenario.steps.size() - currentScenario.steps.size();
@@ -205,38 +200,38 @@ public class GherkinAssert {
         return new JCCannotContinueException("", id);
     }
 
-    public static void sameNumberOfScenarios(GherkinFeature featureFile, GherkinProgress progress, HashMap<GherkinScenario, GherkinScenario> file2actual) {
+    public static void sameNumberOfScenarios(GherkinFeature expectedFeature, GherkinProgress progress, HashMap<GherkinScenario, GherkinScenario> expected2actual) {
 
         // let's fill this with forgotten steps...
         ArrayList<GherkinScenario> scenariosToImplement = new ArrayList<>();
 
         // #scenarios on feature file = #actual scenarios + #failed backgrounds
-        int scenarioDif = featureFile.scenarios.size() - progress.getCurrentFeature().scenarios.size() - progress.getCurrentFeature().orphanBackgrounds.size();
+        int scenarioDif = expectedFeature.scenarios.size() - progress.getCurrentFeature().scenarios.size() - progress.getCurrentFeature().getNumberOfFailedBackgrounds();
 
         // forgot to implement some steps from within the feature definition
         if (scenarioDif > 0) {
-            if (progress.getCurrentFeature().orphanBackgrounds.size()>0) {
+            if (progress.getCurrentFeature().getNumberOfFailedBackgrounds()>0) {
                 // wierd edge case where user forgot to implement a scenario and also background failed
                 // so I have no idea which is the missing scenario vs. the scenario with the failed background.
-                // decided to not do anything since user will get an error of his failed background, when he fixes the error, he will get this one...
+                // decided to not do anything since user will get an error of his failed background anyway, when he fixes the error, he will get this one...
                 return;
             }
             String message = String.format("\nYou forgot to implement %s scenarios:\n", String.valueOf(scenarioDif));
-            for (GherkinScenario scenarioDef : featureFile.scenarios) {
-                if (!file2actual.containsKey(scenarioDef)) {
-                    scenariosToImplement.add(scenarioDef);
+            for (GherkinScenario expectedScenario : expectedFeature.scenarios) {
+                if (!expected2actual.containsKey(expectedScenario)) {
+                    scenariosToImplement.add(expectedScenario);
                 }
             }
 
-            for (GherkinScenario scenario : scenariosToImplement) {
-                message+= scenario.printScenario();
+            for (GherkinScenario unimplementedScenario : scenariosToImplement) {
+                message+= unimplementedScenario.printScenario();
                 message+="\n";
             }
 
             message += "\nimplement missing steps using below code:\n\n";
 
-            for (GherkinScenario scenario : scenariosToImplement) {
-                message+= scenario.printScenarioCode();
+            for (GherkinScenario unimplementedScenario : scenariosToImplement) {
+                message+= unimplementedScenario.printScenarioCode();
                 message+="\n\n";
             }
 

@@ -24,7 +24,7 @@ public class TestDefects {
 
     @Before
     public void background() {
-        jc.background("B", ()-> {
+        jc.background(()-> {
             jc.given("G");
         });
     }

@@ -43,17 +43,22 @@ public class GherkinLexerListener implements Listener {
     }
 
     public void background(String element, String title, String description, Integer line) {
-        currentScenario = currentFeature.background = background = new GherkinBackground(title);
-
+        currentScenario = background = new GherkinBackground(title);
     }
 
     public void scenario(String element, String title, String description, Integer integer) {
         GherkinScenario scenario = new GherkinScenario(title);
 
         scenario.setParent(currentFeature);
-        scenario.attachBackground(currentFeature.background);
-        currentFeature.scenarios.add(scenario);
 
+        // Copy background steps to current scenario
+        if (background != null) {
+            for (GherkinStep step : background.steps) {
+                scenario.steps.add(new GherkinStep(step, background));
+            }
+        }
+
+        currentFeature.scenarios.add(scenario);
         currentScenario = scenario;
     }
 
@@ -63,8 +68,8 @@ public class GherkinLexerListener implements Listener {
     public void examples(String s, String s1, String s2, Integer integer) {
     }
 
-    public void step(String s, String s1, Integer integer) {
-        GherkinStep step = new GherkinStep(s, s1);
+    public void step(String element, String description, Integer integer) {
+        GherkinStep step = new GherkinStep(element, description);
 
         currentScenario.steps.add(step);
         currentStep = step;
