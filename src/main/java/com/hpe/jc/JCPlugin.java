@@ -17,8 +17,8 @@ public abstract class JCPlugin {
         this.progress = progress;
     }
 
-    protected abstract void onBackgroundStart();
-    protected abstract void onBackgroundEnd();
+//    protected abstract void onBackgroundStart();
+//    protected abstract void onBackgroundEnd();
     protected abstract void onEndOfAny();
     protected abstract void onStartOfAny();
     protected abstract void onInit();

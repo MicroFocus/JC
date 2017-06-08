@@ -21,6 +21,9 @@ public class JC {
     // 2. compare against real feature file
     private GherkinProgress progress;
 
+    // calling background will not actually run it.
+    // the scenario will run the background before it begins.
+    private Runnable backgroundCode;
 
     /*********************************
      * Constructors methods - JC definitions
@@ -61,6 +64,9 @@ public class JC {
 
         // handle running the scenario
         try {
+            if (backgroundCode!=null) {
+                backgroundCode.run();
+            }
             code.run();
         } catch (JCCannotContinueException e) {
             progress.updateException(e);
@@ -88,28 +94,12 @@ public class JC {
     }
 
 */
-    public void background(String description, Runnable code) {
-        // update progress with scenario
-        GherkinBackground background = new GherkinBackground(description);
-        progress.updateBackground(background);
+    public void background(Runnable code) {
 
-        // handle running the scenario
-        try {
-            code.run();
-        } catch (JCCannotContinueException e) {
-            progress.updateException(e);
-            throw e;
-        } catch (Exception | Error e) {
-            progress.updateException(e);
-            throw GherkinAssert.createClearExceptionFrom(e, progress);
-        } finally {
-            // update only if everything is ok
-            //if (!progress.isCurrentScenarioHasException()) {
-            progress.updateBackground(null);
-            //}
-            progress.report();
+        // you can call it several times, only first time counts...
+        if (backgroundCode == null) {
+            backgroundCode = code;
         }
-
     }
 
     public void given(String stepDesc) {

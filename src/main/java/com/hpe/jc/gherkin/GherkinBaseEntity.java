@@ -62,6 +62,9 @@ public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionH
         return fatalExceptions;
     }
 
+    public boolean hasMeaningfulExceptions() {
+        return (getTestExceptions().size() + getFatalExceptions().size()) > 0;
+    }
 
     HashMap<Class, Object> pluginData = new HashMap<>();
     HashMap<Class, HashMap<String, Object>> pluginDataWithKey = new HashMap<>();

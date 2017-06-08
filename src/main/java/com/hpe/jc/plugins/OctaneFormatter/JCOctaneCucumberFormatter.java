@@ -30,16 +30,16 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
 
     @Override
     protected void onInit() { }
-
-    @Override
-    protected void onBackgroundStart() {
-
-    }
-
-    @Override
-    protected void onBackgroundEnd() {
-
-    }
+//
+//    @Override
+//    protected void onBackgroundStart() {
+//
+//    }
+//
+//    @Override
+//    protected void onBackgroundEnd() {
+//
+//    }
 
     @Override
     protected void onEndOfAny() {
@@ -192,13 +192,13 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
         Element steps = doc.createElement(STEPS_TAG_NAME);
         scenario.appendChild(steps);
 
-        // add background steps
-        // todo: need to solve serious issue: expected have 1 copy of background with 1 copy of each step. problem. expected2actual can't help us find the actual in this case...
-        if (expectedScenario.getParent().background != null) {
-            for (GherkinStep expectedStep : expectedScenario.getParent().background.steps) {
-                steps.appendChild(getXMLForStep(expectedStep, expected2actualMap.get(expectedStep), doc));
-            }
-        }
+//        // add background steps
+//        // todo: need to solve serious issue: expected have 1 copy of background with 1 copy of each step. problem. expected2actual can't help us find the actual in this case...
+//        if (expectedScenario.getBackground() != null) {
+//            for (GherkinStep expectedStep : expectedScenario.getBackground().steps) {
+//                steps.appendChild(getXMLForStep(expectedStep, expected2actualMap.get(expectedStep), doc));
+//            }
+//        }
 
         // add scenario steps
         for (GherkinStep expectedStep : expectedScenario.steps) {

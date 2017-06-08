@@ -16,18 +16,18 @@ public class LogPlugin extends JCPlugin {
     @Override
     protected void onInit() { }
 
-
-    @Override
-    protected void onBackgroundStart() {
-        log.add("s"+progress.getCurrentScenario().getDescription());
-
-    }
-
-    @Override
-    protected void onBackgroundEnd() {
-        log.add("e"+progress.getCurrentScenario().getDescription());
-
-    }
+//
+//    @Override
+//    protected void onBackgroundStart() {
+//        log.add("s"+progress.getCurrentScenario().getDescription());
+//
+//    }
+//
+//    @Override
+//    protected void onBackgroundEnd() {
+//        log.add("e"+progress.getCurrentScenario().getDescription());
+//
+//    }
 
     @Override
     protected void onEndOfAny() {

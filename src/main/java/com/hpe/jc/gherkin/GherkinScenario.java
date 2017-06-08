@@ -29,6 +29,7 @@ public class GherkinScenario extends GherkinBaseEntity{
         super(description);
     }
 
+
     public GherkinStep getNextStep(GherkinStep step) {
 
         // no step -> return first step

@@ -8,7 +8,9 @@ import java.util.ArrayList;
 public class GherkinBackground extends GherkinScenario{
 
     // not started, in progress, done, done with errors. Updated by GherkinProgress.
-    public GherkinElementStatus status = GherkinElementStatus.NOT_STARTED;
+    //public GherkinElementStatus status = GherkinElementStatus.NOT_STARTED;
+
+    public GherkinScenario parentScenario = null;
 
     public GherkinBackground(String description) {
 
