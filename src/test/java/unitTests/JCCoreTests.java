@@ -1,33 +1,40 @@
 package unitTests; /**
  * Created by koreny on 3/20/2017.
  */
-import com.hpe.jc.GherkinProgress;
-import com.hpe.jc.JC;
+import static com.hpe.jc.JC.*;
+
 import com.hpe.jc.JCPlugin;
+import com.hpe.jc.plugins.Feature;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import testUtils.LogPlugin;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-
+@SuppressWarnings("ALL")
+@Feature("1")
 public class JCCoreTests {
+
+    static LogPlugin log = null;
+
+    @Before
+    public void before() {
+        log = new LogPlugin();
+        reset(new JCPlugin[] {log});
+    }
 
     @Test
     public void TestBasicFlow() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
-        jc.scenario("11", ()->{
-            jc.given("111");
-            jc.when("112");
-            jc.then("113");
+        scenario("11", ()->{
+            given("111");
+            when("112");
+            then("113");
         });
-        jc.scenario("12", ()->{
-            jc.given("121");
-            jc.when("122");
-            jc.then("123");
+        scenario("12", ()->{
+            given("121");
+            when("122");
+            then("123");
         });
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
             "s1",
@@ -55,26 +62,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter11() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
+            scenario("11", ()->{
                 if (true==true) throw new RuntimeException("error");
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()->{
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -97,26 +102,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter111() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
+            scenario("11", ()->{
+                given("111");
                 if (true==true) throw new RuntimeException("error");
-                jc.when("112");
-                jc.then("113");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()->{
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -141,26 +144,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter112() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
+            scenario("11", ()->{
+                given("111");
+                when("112");
                 if (true==true) throw new RuntimeException("error");
-                jc.then("113");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()->{
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -187,26 +188,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter113() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
                 if (true==true) throw new RuntimeException("error");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()->{
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -235,26 +234,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter12() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
+            scenario("12", ()->{
                 if (true==true) throw new RuntimeException("error");
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -277,26 +274,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter121() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
+            scenario("12", ()->{
+                given("121");
                 if (true==true) throw new RuntimeException("error");
-                jc.when("122");
-                jc.then("123");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -321,26 +316,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter122() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
+            scenario("12", ()->{
+                given("121");
+                when("122");
                 if (true==true) throw new RuntimeException("error");
-                jc.then("123");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -367,26 +360,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorAfter123() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()->{
+                given("121");
+                when("122");
+                then("123");
                 if (true==true) throw new RuntimeException("error");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -415,26 +406,24 @@ public class JCCoreTests {
 
     @Test
     public void TestFlowWithErrorBefore11() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
             if (true==true) throw new RuntimeException("error");
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) { }
 
         try {
-            jc.scenario("12", ()->{
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()->{
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable ex) { }
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",

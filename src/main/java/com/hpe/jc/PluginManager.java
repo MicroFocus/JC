@@ -19,9 +19,8 @@ public class PluginManager extends JCPlugin {
         for (JCPlugin plugin : pluginsArr) {
             plugin.setProgress(progress);
             plugins.add(plugin);
+            runPlugin(initExceptionHolder, (p)-> p.onInit(), plugin);
         }
-
-        onInit();
     }
 
     public ArrayList<JCPlugin> getPlugins() {
@@ -31,35 +30,28 @@ public class PluginManager extends JCPlugin {
     private void run(IJCExceptionHolder entity, IJCRunPlugin code) {
 
         for (JCPlugin plugin : plugins) {
-            try {
-                 code.run(plugin);
-            } catch (JCCannotContinueException ex) {
-                ex.originPlugin = plugin;
-                entity.addFatalException(ex);
-                throw ex;
-            } catch (Throwable ex) {
-                entity.addPluginException(ex);
-            }
+            runPlugin(entity, code, plugin);
+        }
+    }
+
+    private void runPlugin(IJCExceptionHolder entity, IJCRunPlugin code, JCPlugin plugin) {
+
+        try {
+            code.run(plugin);
+        } catch (JCCannotContinueException ex) {
+            ex.originPlugin = plugin;
+            entity.addFatalException(ex);
+            throw ex;
+        } catch (Throwable ex) {
+            entity.addPluginException(ex);
         }
     }
 
 
     @Override
     protected void onInit() {
-        run(initExceptionHolder, (plugin)-> plugin.onInit());
+        //Init is called on each registration of plugin to allow splitting the registration
     }
-
-//    @Override
-//    protected void onBackgroundStart() {
-//        run(progress.getCurrent(), (plugin)-> plugin.onStartOfAny());
-//        run(progress.getLatestBackground(), (plugin)-> plugin.onBackgroundStart());
-//    }
-//
-//    @Override
-//    protected void onBackgroundEnd() {
-//        run(progress.getCurrent(), (plugin)-> plugin.onEndOfAny());
-//        run(progress.getLatestBackground(), (plugin)-> plugin.onBackgroundEnd());
-//    }
 
     @Override
     protected void onEndOfAny() {

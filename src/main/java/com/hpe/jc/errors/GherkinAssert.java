@@ -6,6 +6,8 @@ import com.hpe.jc.GherkinProgress;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
 import com.hpe.jc.JCCannotContinueException;
+import com.hpe.jc.plugins.Feature;
+import com.hpe.jc.plugins.FeatureFileAt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ public class GherkinAssert {
 
 
     public enum ERROR_TYPES {
+        FEATURE_NOT_DECLARED,
         FEATURES_MISMATCH,
         SCENARIO_TOO_FEW,
         SCENARIO_MISMATCH,
@@ -25,6 +28,7 @@ public class GherkinAssert {
         STEP_TOO_MANY,
         STEP_TOO_FEW,
         STEP_MISMATCH,
+        LEXER_ERROR,
     }
 //
 //    public static void backgroundTitleShouldBeAsInDefinition(GherkinBackground latestBackground, GherkinBackground expectedbackground) {
@@ -62,6 +66,27 @@ public class GherkinAssert {
 //            throw createException(message, ERROR_TYPES.BACKGROUND_IS_NOT_EXPECTED);
 //        }
 //    }
+
+    public static void featureFileAtAnnotationNotFound(FeatureFileAt featureFileAt, Class<?> cls) {
+        if (featureFileAt==null) {
+            String message = String.format("\n" +
+                    "the class \'%s\' does not contain the \'FeatureFileAt\' annotation. \n" +
+                    "This annotation declares the path to the feature file for authentication of the flow",
+                    cls.getName());
+            throw createException(message, ERROR_TYPES.FEATURE_NOT_DECLARED);
+        }
+    }
+
+
+    public static void featureAnnotationNotFound(Feature feature, Class<?> cls) {
+        if (feature==null) {
+            String message = String.format("\n" +
+                    "the class \'%s\' does not contain the \'Feature\' annotation.",
+                    cls.getName());
+            throw createException(message, ERROR_TYPES.FEATURE_NOT_DECLARED);
+        }
+    }
+
 
     public static void featureTitleShouldBeAsInDefinition(GherkinFeature actual, GherkinFeature expected) {
         if (notTheSame(actual.getDescription(), expected.getDescription())) {

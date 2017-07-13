@@ -3,41 +3,53 @@ package unitTests; /**
  */
 import com.hpe.jc.JC;
 import com.hpe.jc.JCPlugin;
+import com.hpe.jc.plugins.Feature;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import testUtils.LogPlugin;
 
 import java.util.ArrayList;
 
+import static com.hpe.jc.JC.*;
+
+@SuppressWarnings("ALL")
+@Feature("1")
 public class JCBeforeSyntaxTests {
+
+    static LogPlugin log = null;
+
+    @Before
+    public void before() {
+        log = new LogPlugin();
+        reset(new JCPlugin[] {log});
+    }
 
     @Test
     public void TestBasicFlow() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
-        jc.background(()->{
-            jc.given("001");
-            jc.when("002");
-            jc.then("003");
+        background(()->{
+            given("001");
+            when("002");
+            then("003");
 
         });
-        jc.scenario("11", ()->{
-            jc.given("111");
-            jc.when("112");
-            jc.then("113");
+        scenario("11", ()->{
+            given("111");
+            when("112");
+            then("113");
         });
-        jc.background(()->{
-            jc.given("001");
-            jc.when("002");
-            jc.then("003");
+        background(()->{
+            given("001");
+            when("002");
+            then("003");
 
         });
-        jc.scenario("12", ()->{
-            jc.given("121");
-            jc.when("122");
-            jc.then("123");
+        scenario("12", ()->{
+            given("121");
+            when("122");
+            then("123");
         });
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
             "s1",
@@ -77,45 +89,43 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionAfter00() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         final ArrayList<Object> bool = new ArrayList<>();
         try {
-            jc.background(()-> {
+            background(()-> {
                 if (bool.size()==0) {
                     bool.add(new Object());
                     throw new RuntimeException("Error");
                 }
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+                given("001");
+                when("002");
+                then("003");
 
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
-            jc.background(()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()->{
+                given("001");
+                when("002");
+                then("003");
 
             });
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()-> {
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -144,39 +154,37 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionAfter001() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
             final ArrayList<Object> bool = new ArrayList<>();
-            jc.background(()-> {
-                jc.given("001");
+            background(()-> {
+                given("001");
                 if (bool.size()==0) {
                     bool.add(new Object());
                     throw new RuntimeException("error");
                 }
-                jc.when("002");
-                jc.then("003");
+                when("002");
+                then("003");
 
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()-> {
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -207,39 +215,37 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionAfter002() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
             final ArrayList<Object> bool = new ArrayList<>();
-            jc.background(()-> {
-                jc.given("001");
-                jc.when("002");
+            background(()-> {
+                given("001");
+                when("002");
                 if (bool.size()==0) {
                     bool.add(new Object());
                     throw new RuntimeException("error");
                 }
-                jc.then("003");
+                then("003");
 
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()-> {
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -272,14 +278,12 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionAfter003() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
             final ArrayList<Object> bool = new ArrayList<>();
-            jc.background(()-> {
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()-> {
+                given("001");
+                when("002");
+                then("003");
                 if (bool.size()==0) {
                     bool.add(new Object());
                     throw new RuntimeException("error");
@@ -287,24 +291,24 @@ public class JCBeforeSyntaxTests {
 
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()-> {
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -339,40 +343,38 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionInScenario() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background(()-> {
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()-> {
+                given("001");
+                when("002");
+                then("003");
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
+            scenario("11", ()->{
+                given("111");
                 if (true == true) throw new RuntimeException("error");
-                jc.when("112");
-                jc.then("113");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
-            jc.background(()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()->{
+                given("001");
+                when("002");
+                then("003");
 
             });
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()-> {
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -409,46 +411,43 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionInBackgroundSecondTime() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
-
         final ArrayList<Object> bool = new ArrayList<>();
         try {
-            jc.background(()-> {
-                jc.given("001");
+            background(()-> {
+                given("001");
                 if (bool.size()>0) {
                     throw new RuntimeException("Error");
                 } else {
-                    jc.when("002");
+                    when("002");
                 }
-                jc.then("003");
+                then("003");
                 bool.add(new Object());
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
-            jc.background(()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()->{
+                given("001");
+                when("002");
+                then("003");
 
             });
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", ()-> {
+                given("121");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
@@ -479,40 +478,38 @@ public class JCBeforeSyntaxTests {
 
     @Test
     public void TestExceptionInSecondScenario() {
-        LogPlugin log = new LogPlugin();
-        JC jc = new JC(this, new JCPlugin[] {log},"1");
         try {
-            jc.background(()-> {
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()-> {
+                given("001");
+                when("002");
+                then("003");
             });
 
-            jc.scenario("11", ()->{
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", ()->{
+                given("111");
+                when("112");
+                then("113");
             });
         } catch (Throwable e) {}
 
         try {
-            jc.background(()->{
-                jc.given("001");
-                jc.when("002");
-                jc.then("003");
+            background(()->{
+                given("001");
+                when("002");
+                then("003");
 
             });
 
-            jc.scenario("12", ()-> {
-                jc.given("121");
+            scenario("12", ()-> {
+                given("121");
                 if (true == true) throw new RuntimeException("error");
-                jc.when("122");
-                jc.then("123");
+                when("122");
+                then("123");
             });
 
         } catch (Throwable e) {}
 
-        jc.finished();
+        finished();
 
         String[] expectedFlow = new String[] {
                 "s1",
