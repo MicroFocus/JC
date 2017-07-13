@@ -103,10 +103,10 @@ public class GherkinScenario extends GherkinBaseEntity{
         String code = String.format(
                 "\t@Test\n" +
                 "\tpublic void %s() {\n"+
-                "\t\tjc.scenario(\"%s\", ()->{\n", toCamelCase(getDescription()), getDescription());
+                "\t\tscenario(\"%s\", ()->{\n", toCamelCase(getDescription()), getDescription());
         for (GherkinStep step : steps) {
             code+= String.format(
-                "\t\t\tjc.%s(\"%s\");\n", step.type.toLowerCase(), step.getDescription());
+                "\t\t\t%s(\"%s\");\n", step.type.toLowerCase(), step.getDescription());
         }
         code += String.format(
                 "\t\t});\n" +

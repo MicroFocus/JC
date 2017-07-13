@@ -1,5 +1,6 @@
 package com.hpe.jc.plugins;
 
+import com.hpe.jc.JCCannotContinueException;
 import com.hpe.jc.JCPlugin;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.gherkin.*;
@@ -102,7 +103,12 @@ public class JCPValidateFlowBy extends JCPlugin {
     protected void onInit() {
         // load and parse gherkin script
         expectedScript = readGherkinScript(progress.getTestObject(), featureFileLocation);
-        expectedFeature = parseGherkinScript(expectedScript);
+        try {
+            expectedFeature = parseGherkinScript(expectedScript);
+        } catch (Exception ex) {
+            throw new JCCannotContinueException(this.getClass().toString()+" error ", ex, GherkinAssert.ERROR_TYPES.LEXER_ERROR);
+        }
+
     }
 
 

@@ -19,6 +19,10 @@ public class JCCannotContinueException extends RuntimeException {
         errorId = id;
     }
 
+    public JCCannotContinueException(String message, Exception ex, GherkinAssert.ERROR_TYPES id) {
+        super(message, ex);
+        errorId = id;
+    }
 
     public JCCannotContinueException() {
         super();

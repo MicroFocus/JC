@@ -2,12 +2,6 @@
 @BLABLA
 Feature: hello world
 
-  Background: hello background
-    this is a long description of the background!!!
-    Given I am logged in
-    And I have 3 tests
-    But do not have permissions to delete
-
   Scenario: This is the first scenario
     Given I have a scenario
     When I run my junit test

@@ -3,6 +3,8 @@ package com.hpe.jc;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.gherkin.*;
 
+import java.util.ArrayList;
+
 /**
  * Created by koreny on 3/21/2017.
  */
@@ -29,10 +31,6 @@ public class GherkinProgress {
     private GherkinStep currentStep;
     private GherkinBaseEntity current;
 
-    // since background & scenario are saved in an array, we want to track how many were executed until now.
-    //private int backgroundCounter = 0;
-    //private int scenarioCounter = 0;
-
     // execute the plugins. Funny that it is a plugin itself...
     private PluginManager pluginManager = new PluginManager();
 
@@ -40,11 +38,12 @@ public class GherkinProgress {
      * Public methods
      *************************************/
 
+    public void registerPlugins(JCPlugin[] jcPlugins) {
+        pluginManager.registerPlugins(this, jcPlugins);
+    }
     public Object getTestObject() {
         return test;
     }
-
-//    public GherkinBackground getLatestBackground() { return latestBackground; }
 
     public GherkinFeature getCurrentFeature() { return currentFeature; }
 
@@ -55,10 +54,6 @@ public class GherkinProgress {
     public GherkinStep getCurrentStep() { return currentStep; }
 
     public GherkinBaseEntity getCurrent() { return current; }
-
-//    public boolean isCurrentScenarioHasException() {
-//        return currentScenario.getTestExceptions().size()>0;
-//    }
 
     /*************************************
      * Public methods - update progress
@@ -95,46 +90,12 @@ public class GherkinProgress {
             pluginManager.onScenarioEnd();
         } else {
             // signal start of new scenario
-//            scenarioCounter++;
-//            if (currentFeature.isBackgroundDefined()) {
-//                // connect scenario to it's background
-//                GherkinAssert.shouldBeMatchingNumberOfScenariosToBackgrounds(this, scenarioCounter, backgroundCounter);
-//                actualScenario.attachBackground(currentFeature.getLastBackground());
-//                currentFeature.getLastBackground().parentScenario = actualScenario;
-//            }
             actualScenario.setParent(currentFeature);
             current = currentScenario = actualScenario;
             pluginManager.onScenarioStart();
             currentFeature.scenarios.add(currentScenario);
         }
     }
-
-//
-//    public void updateBackground(GherkinBackground background) {
-//        // nothing to do if no scenario started, and reporting on end of scenario...
-//        if (background == null && currentScenario == null) {
-//            return;
-//        }
-//
-//        // signal the end of current background
-//        if (background == null) {
-//            // end last step if there is one
-//            if (currentStep!=null) {
-//                pluginManager.onStepEnd();
-//                current = currentStep.parent;
-//                currentStep = null;
-//            }
-//            pluginManager.onBackgroundEnd();
-//            backgroundCounter++;
-//        } else {
-//
-//            // signal start of background
-//            current = currentScenario = latestBackground = background;
-//            currentFeature.backgrounds.add(background);
-//            pluginManager.onBackgroundStart();
-//        }
-//
-//    }
 
 
     public void updateStep(GherkinStep nextStep) {

@@ -2,19 +2,27 @@ package unitTests; /**
  * Created by koreny on 3/20/2017.
  */
 
+import static com.hpe.jc.JC.*;
 import com.hpe.jc.JC;
 import com.hpe.jc.JCCannotContinueException;
 import com.hpe.jc.JCPlugin;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.errors.JCException;
+import com.hpe.jc.plugins.Feature;
 import com.hpe.jc.plugins.JCPValidateFlowBy;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import testUtils.ValidateMock;
 
+@SuppressWarnings("ALL")
+@Feature("1")
 public class JCValidateFlowBackground {
 
     //region scripts for the tests
+
+    ValidateMock validate = null;
+            
     final String script =
             "Feature: 1\n" +
                     "Background: 10\n" +
@@ -41,34 +49,38 @@ public class JCValidateFlowBackground {
                     "When 122\n" +
                     "Then 123\n";
 
+    @Before
+    public void Before() {
+        validate = new ValidateMock(script);
+        reset(new JCPlugin [] {validate});
+    }
+    
     //endregion
 
     @Test
     public void TestBasicFlowShouldWork() {
-        ValidateMock validate = new ValidateMock(script);
-        JC jc = new JC(this, new JCPlugin[]{validate}, "1");
 
-        jc.background(() -> {
-            jc.given("101");
-            jc.and("102");
-            jc.but("103");
+        background(() -> {
+            given("101");
+            and("102");
+            but("103");
         });
-        jc.scenario("11", () -> {
-            jc.given("111");
-            jc.when("112");
-            jc.then("113");
+        scenario("11", () -> {
+            given("111");
+            when("112");
+            then("113");
         });
-        jc.background(() -> {
-            jc.given("101");
-            jc.and("102");
-            jc.but("103");
+        background(() -> {
+            given("101");
+            and("102");
+            but("103");
         });
-        jc.scenario("12", () -> {
-            jc.given("121");
-            jc.when("122");
-            jc.then("123");
+        scenario("12", () -> {
+            given("121");
+            when("122");
+            then("123");
         });
-        jc.finished();
+        finished();
     }
 
     @Test
@@ -76,25 +88,22 @@ public class JCValidateFlowBackground {
 
         GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_MISMATCH;
         try {
-            ValidateMock validate = new ValidateMock(script);
-            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-            jc.scenario("11", () -> {
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", () -> {
+                given("111");
+                when("112");
+                then("113");
             });
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("102");
+                but("103");
             });
-            jc.scenario("12", () -> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", () -> {
+                given("121");
+                when("122");
+                then("123");
             });
-            jc.finished();
+            finished();
         } catch (JCCannotContinueException ex) {
             Assert.assertEquals(ex.errorId, expectedId);
             return;
@@ -105,33 +114,40 @@ public class JCValidateFlowBackground {
 
     @Test
     public void TestBackgroundIsUsedButNotNeededAsItIsNotDeclaredInFeatureFile() {
+        validate = new ValidateMock("Feature: 1\n" +
+                "Scenario: 11\n" +
+                "Given 111\n" +
+                "When 112\n" +
+                "Then 113\n" +
+                "Scenario: 12\n" +
+                "Given 121\n" +
+                "When 122\n" +
+                "Then 123\n");
+        reset(new JCPlugin [] {validate});
 
         GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_MISMATCH;
         try {
-            ValidateMock validate = new ValidateMock(scriptWithoutBackground);
-            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("102");
+                but("103");
             });
-            jc.scenario("11", () -> {
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", () -> {
+                given("111");
+                when("112");
+                then("113");
             });
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("102");
+                but("103");
             });
-            jc.scenario("12", () -> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", () -> {
+                given("121");
+                when("122");
+                then("123");
             });
-            jc.finished();
+            finished();
         } catch (JCCannotContinueException ex) {
             Assert.assertEquals(ex.errorId, expectedId);
             return;
@@ -145,26 +161,23 @@ public class JCValidateFlowBackground {
 
         GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_MISMATCH;
         try {
-            ValidateMock validate = new ValidateMock(script);
-            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("error");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("error");
+                but("103");
             });
-            jc.scenario("11", () -> {
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", () -> {
+                given("111");
+                when("112");
+                then("113");
             });
 
-            jc.scenario("12", () -> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", () -> {
+                given("121");
+                when("122");
+                then("123");
             });
-            jc.finished();
+            finished();
         } catch (JCCannotContinueException ex) {
             Assert.assertEquals(ex.errorId, expectedId);
             return;
@@ -175,91 +188,79 @@ public class JCValidateFlowBackground {
 
     @Test(expected = JCException.class)
     public void TestBackgroundThrowsException() {
-
-        ValidateMock validate = new ValidateMock(script);
-        JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-        jc.background(() -> {
-            jc.given("101");
+        background(() -> {
+            given("101");
             if (true==true) throw new RuntimeException("oops!");
-            jc.and("102");
-            jc.but("103");
+            and("102");
+            but("103");
         });
 
-        jc.scenario("11", () -> {
-            jc.given("111");
-            jc.when("112");
-            jc.then("113");
+        scenario("11", () -> {
+            given("111");
+            when("112");
+            then("113");
         });
-        jc.background(() -> {
-            jc.given("101");
-            jc.and("102");
-            jc.but("103");
+        background(() -> {
+            given("101");
+            and("102");
+            but("103");
         });
-        jc.scenario("12", () -> {
-            jc.given("121");
-            jc.when("122");
-            jc.then("123");
+        scenario("12", () -> {
+            given("121");
+            when("122");
+            then("123");
         });
-        jc.finished();
+        finished();
     }
 
     @Test
     public void TestBackgroundCanBeDeclaredOnlyOnce() {
-
-            ValidateMock validate = new ValidateMock(script);
-            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("102");
+                but("103");
             });
-            jc.scenario("11", () -> {
-                jc.given("111");
-                jc.when("112");
-                jc.then("113");
+            scenario("11", () -> {
+                given("111");
+                when("112");
+                then("113");
             });
-            jc.scenario("12", () -> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", () -> {
+                given("121");
+                when("122");
+                then("123");
             });
-            jc.finished();
+            finished();
 
     }
 
     @Test(expected = JCException.class)
     public void TestScenarioAfterBackgroundThrowException() {
-
-        ValidateMock validate = new ValidateMock(script);
-        JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-        jc.background(() -> {
-            jc.given("101");
-            jc.and("102");
-            jc.but("103");
+        background(() -> {
+            given("101");
+            and("102");
+            but("103");
         });
 
-        jc.scenario("11", () -> {
-            jc.given("111");
+        scenario("11", () -> {
+            given("111");
             if (true==true) throw new RuntimeException("oops!");
-            jc.when("112");
-            jc.then("113");
+            when("112");
+            then("113");
         });
 
-        jc.background(() -> {
-            jc.given("101");
-            jc.and("102");
-            jc.but("103");
+        background(() -> {
+            given("101");
+            and("102");
+            but("103");
         });
 
-        jc.scenario("12", () -> {
-            jc.given("121");
-            jc.when("122");
-            jc.then("123");
+        scenario("12", () -> {
+            given("121");
+            when("122");
+            then("123");
         });
-        jc.finished();
+        finished();
     }
 
     @Test
@@ -267,30 +268,27 @@ public class JCValidateFlowBackground {
 
         GherkinAssert.ERROR_TYPES expectedId = GherkinAssert.ERROR_TYPES.STEP_MISMATCH;
         try {
-            ValidateMock validate = new ValidateMock(script);
-            JC jc = new JC(this, new JCPlugin[]{validate}, "1");
-
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("102");
+                but("103");
             });
-            jc.scenario("11", () -> {
-                jc.given("111");
-                jc.when("error");
-                jc.then("113");
+            scenario("11", () -> {
+                given("111");
+                when("error");
+                then("113");
             });
-            jc.background(() -> {
-                jc.given("101");
-                jc.and("102");
-                jc.but("103");
+            background(() -> {
+                given("101");
+                and("102");
+                but("103");
             });
-            jc.scenario("12", () -> {
-                jc.given("121");
-                jc.when("122");
-                jc.then("123");
+            scenario("12", () -> {
+                given("121");
+                when("122");
+                then("123");
             });
-            jc.finished();
+            finished();
         } catch (JCCannotContinueException ex) {
             Assert.assertEquals(ex.errorId, expectedId);
             return;

@@ -1,9 +1,6 @@
 package com.hpe.jc.plugins;
 
-import com.hpe.jc.gherkin.GherkinBackground;
-import com.hpe.jc.gherkin.GherkinFeature;
-import com.hpe.jc.gherkin.GherkinScenario;
-import com.hpe.jc.gherkin.GherkinStep;
+import com.hpe.jc.gherkin.*;
 import gherkin.lexer.Listener;
 import java.util.List;
 
@@ -14,14 +11,9 @@ import java.util.List;
  * The expected feature will be compared to the actual feature structure by the JCPValidateFlowBy plugin so we can point out differences
  * Structure is:
  * - feature
- *   + background
- *     - steps
  *   + Scenarios
- *     - Steps
- *
- * The expected and actual feature have identical structure except 1 thing - the background:
- * The expected has 1 copy of the background at the feature level.
- * The actual has a copy of the background for each scenario (because it saves exception information that could be different between background runs)
+ *     - background Steps
+ *     - regular steps
  */
 public class GherkinLexerListener implements Listener {
 
@@ -49,6 +41,10 @@ public class GherkinLexerListener implements Listener {
     public void scenario(String element, String title, String description, Integer integer) {
         GherkinScenario scenario = new GherkinScenario(title);
 
+        setupScenario(scenario);
+    }
+
+    private void setupScenario(GherkinScenario scenario) {
         scenario.setParent(currentFeature);
 
         // Copy background steps to current scenario
@@ -62,10 +58,13 @@ public class GherkinLexerListener implements Listener {
         currentScenario = scenario;
     }
 
-    public void scenarioOutline(String s, String s1, String s2, Integer integer) {
+    public void scenarioOutline(String element, String title, String s2, Integer line) {
+        GherkinScenarioOutline scenario = new GherkinScenarioOutline(title);
+
+        setupScenario(scenario);
     }
 
-    public void examples(String s, String s1, String s2, Integer integer) {
+    public void examples(String element, String s1, String s2, Integer line) {
     }
 
     public void step(String element, String description, Integer integer) {
@@ -75,7 +74,15 @@ public class GherkinLexerListener implements Listener {
         currentStep = step;
     }
 
-    public void row(List<String> list, Integer integer) {
+    public void row(List<String> params, Integer line) {
+        GherkinScenarioOutline scenario = (GherkinScenarioOutline)currentScenario;
+
+        boolean firstRowOfTable = scenario.paramKeys.size()==0;
+        if (firstRowOfTable) {
+            scenario.paramKeys = params;
+        } else {
+            scenario.paramValues.add(params);
+        }
     }
 
     public void docString(String s, String s1, Integer integer) {
