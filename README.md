@@ -2,26 +2,26 @@
 
 **Project is still under construction...**
 
-###Keep your junit tests. use BDD methodology.
+### Keep your junit tests. use BDD methodology.
 - JC allows to annotate regular junit tests using Gherkin syntax.  
 - Then, it can optionally validate those annotations against a feature file.  
 
-###JS helps to Integrate with ALM Octane
+### JS helps to Integrate with ALM Octane
 - It also creates a report that allows uploading results to ALM Octane as Scenario Tests.
 
-###JC upgrades your error messages
+### JC upgrades your error messages
 - JC generates clear error message: it writes all the steps up to the failure so you have context
 - When feature file changes, get a detailed error on which annotation is changed
 
-###JC builds test skeletons from a feature file
+### JC builds test skeletons from a feature file
 - When you want to automate a new feature file, JS can build the skeleton of all of your tests in a breeze.
 - Just point to the feature file and run -
 - JC will write the whole class with annotations inside the error message 
 
-###JC is extensible 
+### JC is extensible 
 - You can create your own plugin that collects information during the run and print report at the end
 
-###Example:
+### Example:
 
 ```java
 @FeatureFileAt("/features/lavaSoft.feature")
