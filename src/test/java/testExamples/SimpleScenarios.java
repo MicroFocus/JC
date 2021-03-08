@@ -1,10 +1,10 @@
 package testExamples;
 
-import com.hpe.jc.plugins.Feature;
-import com.hpe.jc.plugins.FeatureFileAt;
+import com.microfocus.jc.plugins.Feature;
+import com.microfocus.jc.plugins.FeatureFileAt;
 import org.junit.AfterClass;
 import org.junit.Test;
-import static com.hpe.jc.JC.*;
+import static com.microfocus.jc.JC.*;
 
 /**
  * Created by koreny on 3/20/2017.

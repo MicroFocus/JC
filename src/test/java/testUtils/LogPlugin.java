@@ -1,6 +1,6 @@
 package testUtils;
 
-import com.hpe.jc.JCPlugin;
+import com.microfocus.jc.JCPlugin;
 import org.junit.Assert;
 
 import java.util.ArrayList;

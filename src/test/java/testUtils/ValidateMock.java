@@ -1,6 +1,6 @@
 package testUtils;
 
-import com.hpe.jc.plugins.JCPFeatureFileValidator;
+import com.microfocus.jc.plugins.JCPFeatureFileValidator;
 
 /**
  * Created by koreny on 6/3/2017.

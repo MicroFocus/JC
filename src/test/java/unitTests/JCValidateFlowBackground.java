@@ -4,13 +4,13 @@ package unitTests;
  * Created by koreny on 3/20/2017.
  */
 
-import static com.hpe.jc.JC.*;
+import static com.microfocus.jc.JC.*;
 
-import com.hpe.jc.JCCannotContinueException;
-import com.hpe.jc.JCPlugin;
-import com.hpe.jc.errors.GherkinAssert;
-import com.hpe.jc.errors.JCException;
-import com.hpe.jc.plugins.Feature;
+import com.microfocus.jc.JCCannotContinueException;
+import com.microfocus.jc.JCPlugin;
+import com.microfocus.jc.errors.GherkinAssert;
+import com.microfocus.jc.errors.JCException;
+import com.microfocus.jc.plugins.Feature;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
