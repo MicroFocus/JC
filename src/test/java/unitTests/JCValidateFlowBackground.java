@@ -1,15 +1,16 @@
-package unitTests; /**
+package unitTests;
+
+/**
  * Created by koreny on 3/20/2017.
  */
 
 import static com.hpe.jc.JC.*;
-import com.hpe.jc.JC;
+
 import com.hpe.jc.JCCannotContinueException;
 import com.hpe.jc.JCPlugin;
 import com.hpe.jc.errors.GherkinAssert;
 import com.hpe.jc.errors.JCException;
 import com.hpe.jc.plugins.Feature;
-import com.hpe.jc.plugins.JCPValidateFlowBy;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

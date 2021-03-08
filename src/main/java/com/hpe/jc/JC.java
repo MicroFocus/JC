@@ -10,8 +10,8 @@ import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
 import com.hpe.jc.plugins.Feature;
 import com.hpe.jc.plugins.FeatureFileAt;
-import com.hpe.jc.plugins.JCPValidateFlowBy;
-import com.hpe.jc.plugins.JCTimePlugin;
+import com.hpe.jc.plugins.JCPFeatureFileValidator;
+import com.hpe.jc.plugins.JCPStepTimer;
 import com.hpe.jc.plugins.OctaneFormatter.JCOctaneCucumberFormatter;
 
 import java.lang.annotation.Annotation;
@@ -82,12 +82,12 @@ public class JC {
 
         // init plugins
         ArrayList<JCPlugin> plugins = new ArrayList<>();
-        plugins.add(new JCTimePlugin());
+        plugins.add(new JCPStepTimer());
 
         // add feature file validation plugins if exist
         FeatureFileAt featureFileAt = currentTestClass.getAnnotation(FeatureFileAt.class);
         if (featureFileAt != null) {
-            plugins.add(new JCPValidateFlowBy(featureFileAt.value()));
+            plugins.add(new JCPFeatureFileValidator(featureFileAt.value()));
             plugins.add(new JCOctaneCucumberFormatter());
         }
 
@@ -140,6 +140,8 @@ public class JC {
                 return cls;
             }
         }
+
+        GherkinAssert.failedToFoundATestClassWithAnnotation(stack, targetAnnotation);
         return null;
     }
 

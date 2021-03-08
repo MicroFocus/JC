@@ -9,18 +9,23 @@ import java.util.HashMap;
 public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionHolder, IJCPluginDataHolder, IPrintMyself {
     private String description;
 
-    // when the plugin has a bug... logged but do not stop the test
+    // when the plugin itself has a bug... logged but do not stop the test
     private ArrayList<Throwable> pluginExceptions = new ArrayList<>();
 
-    // when the test result is fail. used as indication that this part of the test has a failure
+    // when the test result is failure. used as indication that this part of the test has a failure
     private ArrayList<Throwable> testExceptions = new ArrayList<>();
 
-    // when plugin want to stop execution. Used in syntax validation plugin. this is supposed to show a different error, without flow
+    // when plugin need to stop execution. Used in syntax validation plugin.
+    // this is supposed to show a different error, without flow of event and BOOM...
     private ArrayList<Throwable> fatalExceptions = new ArrayList<>();
 
     GherkinBaseEntity(String description) {
         this.description = description;
     }
+
+    /*************************************
+     IJCDescription implementation
+     *************************************/
 
     @Override
     public void setDescription(String description) {
@@ -31,6 +36,10 @@ public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionH
     public String getDescription() {
         return description;
     }
+
+    /*************************************
+     IJCExceptionHolder implementation
+     *************************************/
 
     @Override
     public void addPluginException(Throwable ex) {
@@ -66,18 +75,12 @@ public abstract class GherkinBaseEntity implements IJCDescription, IJCExceptionH
         return (getTestExceptions().size() + getFatalExceptions().size()) > 0;
     }
 
+    /*************************************
+     IJCPluginDataHolder implementation
+     *************************************/
+
     HashMap<Class, Object> pluginData = new HashMap<>();
     HashMap<Class, HashMap<String, Object>> pluginDataWithKey = new HashMap<>();
-
-    @Override
-    public void setData(Class plugin, Object data) {
-        pluginData.put(plugin, data);
-    }
-
-    @Override
-    public Object getData(Class plugin) {
-        return pluginData.get(plugin);
-    }
 
     @Override
     public void setData(Class plugin, String key, Object data)

@@ -10,23 +10,6 @@ public class GherkinFeature extends GherkinBaseEntity {
     public ArrayList<GherkinScenario> scenarios = new ArrayList<>();
     public ArrayList<GherkinBackground> backgrounds = new ArrayList<>();
     public ArrayList<String> tags = new ArrayList<>();
-    //public GherkinBackground background = null;
-
-    // used to store backgrounds that threw exception and their scenario never started to run...
-    //public ArrayList<GherkinBackground> orphanBackgrounds = new ArrayList<>();
-
-    public GherkinBackground getLastBackground() {
-        return backgrounds.get(backgrounds.size()-1);
-    }
-
-    public boolean isBackgroundDefined() {
-        return backgrounds.size()>0;
-    }
-
-    public GherkinBackground findBackgroundwithSameIndexFrom(GherkinFeature otherFeature, GherkinBackground match) {
-        int index = backgrounds.lastIndexOf(match);
-        return otherFeature.backgrounds.get(index);
-    }
 
     public GherkinFeature(String featureDescription) {
         super(featureDescription);

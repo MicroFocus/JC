@@ -5,8 +5,8 @@ import com.hpe.jc.errors.JCException;
 import com.hpe.jc.gherkin.GherkinFeature;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
-import com.hpe.jc.plugins.JCPValidateFlowBy;
-import com.hpe.jc.plugins.JCTimePlugin;
+import com.hpe.jc.plugins.JCPFeatureFileValidator;
+import com.hpe.jc.plugins.JCPStepTimer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -30,31 +30,15 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
 
     @Override
     protected void onInit() { }
-//
-//    @Override
-//    protected void onBackgroundStart() {
-//
-//    }
-//
-//    @Override
-//    protected void onBackgroundEnd() {
-//
-//    }
 
     @Override
-    protected void onEndOfAny() {
-
-    }
+    protected void onEndOfAny() { }
 
     @Override
-    protected void onStartOfAny() {
-
-    }
+    protected void onStartOfAny() { }
 
     @Override
-    protected void onFeatureStart() {
-
-    }
+    protected void onFeatureStart() { }
 
     @Override
     protected void onFeatureEnd() {
@@ -62,29 +46,19 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
     }
 
     @Override
-    protected void onScenarioStart() {
-
-    }
+    protected void onScenarioStart() { }
 
     @Override
-    protected void onScenarioEnd() {
-
-    }
+    protected void onScenarioEnd() { }
 
     @Override
-    protected void onStepStart() {
-
-    }
+    protected void onStepStart() { }
 
     @Override
-    protected void onStepEnd() {
-
-    }
+    protected void onStepEnd() { }
 
     @Override
-    protected void onStepFailure(Throwable ex) {
-
-    }
+    protected void onStepFailure(Throwable ex) { }
 
     private static String getOctaneTag(GherkinFeature feature) {
         for (String tag : feature.tags) {
@@ -110,13 +84,13 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
             throw new JCException(errorPrefix + "Failed to create xml document",e);
         }
 
-        GherkinFeature expectedFeature = JCPValidateFlowBy.getExpectedFeature(progress.getCurrentFeature());
-        scenarioMap = JCPValidateFlowBy.getExpectedToActualScenarioMap(progress.getCurrentFeature());
-        expected2actualMap = JCPValidateFlowBy.getExpectedToActualStepMap(progress.getCurrentFeature());
+        GherkinFeature expectedFeature = JCPFeatureFileValidator.getExpectedFeature(progress.getCurrentFeature());
+        scenarioMap = JCPFeatureFileValidator.getExpectedToActualScenarioMap(progress.getCurrentFeature());
+        expected2actualMap = JCPFeatureFileValidator.getExpectedToActualStepMap(progress.getCurrentFeature());
 
         boolean isDefFileMissing = expectedFeature == null || scenarioMap==null || expected2actualMap ==null;
         if (isDefFileMissing) {
-            throw new JCException(String.format("%s plugin is missing. It is needed to generate an octane XML result", JCPValidateFlowBy.class.toString()));
+            throw new JCException(String.format("%s plugin is missing. It is needed to generate an octane XML result", JCPFeatureFileValidator.class.toString()));
         }
 
         // generate report
@@ -136,25 +110,24 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
         }
     }
 
-
     public Element getXMLForFeature(GherkinFeature expectedFeature, GherkinFeature actualFeature, Document doc) {
 
         Element feature = doc.createElement(GherkinSerializer.FEATURE_TAG_NAME);
 
         // Adding the feature members
         feature.setAttribute("name", expectedFeature.getDescription());
-        feature.setAttribute("path", JCPValidateFlowBy.getFeatureFileLocation(actualFeature));
+        feature.setAttribute("path", JCPFeatureFileValidator.getFeatureFileLocation(actualFeature));
         feature.setAttribute("tag", getOctaneTag(expectedFeature));
 
         // get start date/time
-        Date startTime = JCTimePlugin.getStartTime(actualFeature);
+        Date startTime = JCPStepTimer.getStartTime(actualFeature);
         feature.setAttribute("started", String.valueOf(startTime.getTime()));
         //Format format = new SimpleDateFormat("yyyy MM dd HH:mm:ss");
         //feature.setAttribute("started",  format.format(startTime));
 
         // Adding the file to the feature
         Element fileElement = doc.createElement(GherkinSerializer.FILE_TAG_NAME);
-        String expectedScript = JCPValidateFlowBy.getExpectedScript(actualFeature);
+        String expectedScript = JCPFeatureFileValidator.getExpectedScript(actualFeature);
         fileElement.appendChild(doc.createCDATASection(expectedScript));
         feature.appendChild(fileElement);
 
@@ -208,7 +181,6 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
         return scenario;
     }
 
-
     public Element getXMLForStep(GherkinStep expectedStep, GherkinStep actualStep, Document doc) {
 
         Element step = doc.createElement(STEP_TAG_NAME);
@@ -223,8 +195,8 @@ public class JCOctaneCucumberFormatter extends JCPlugin {
             errorMessages += String.format("step was skipped due to error in previous step");
 
         } else {
-            Date startTime = JCTimePlugin.getStartTime(actualStep);
-            Date endTime = JCTimePlugin.getEndTime(actualStep);
+            Date startTime = JCPStepTimer.getStartTime(actualStep);
+            Date endTime = JCPStepTimer.getEndTime(actualStep);
             long duration = (endTime.getTime() - startTime.getTime()); // in sec
 
             int numOfErrors = actualStep.getFatalExceptions().size()+actualStep.getPluginExceptions().size()+actualStep.getTestExceptions().size();

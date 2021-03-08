@@ -8,7 +8,7 @@ import java.util.List;
  * Created by koreny on 3/24/2017.
  *
  * This is a lexer that creates the expected feature structure from the feature definition file.
- * The expected feature will be compared to the actual feature structure by the JCPValidateFlowBy plugin so we can point out differences
+ * The expected feature will be compared to the actual feature structure by the JCPFeatureFileValidator plugin so we can point out differences
  * Structure is:
  * - feature
  *   + Scenarios

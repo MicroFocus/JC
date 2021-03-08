@@ -1,10 +1,5 @@
 package com.hpe.jc;
 
-import com.hpe.jc.gherkin.GherkinBaseEntity;
-import com.hpe.jc.plugins.IJCDataGetter;
-
-import java.util.HashMap;
-
 /**
  * Created by koreny on 3/29/2017.
  */
