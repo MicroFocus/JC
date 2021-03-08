@@ -1,4 +1,4 @@
-# JC - Cucumber Library for UI Automation
+# JC - Cucumber with Regular JUnit Tests
 
 **Project is still under construction...**
 
