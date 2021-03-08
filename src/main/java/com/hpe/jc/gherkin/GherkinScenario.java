@@ -8,17 +8,7 @@ import java.util.ArrayList;
 public class GherkinScenario extends GherkinBaseEntity{
 
     private GherkinFeature parent;
-    private GherkinBackground background;
     public ArrayList<GherkinStep> steps = new ArrayList<GherkinStep>();
-
-    public GherkinFeature getParent() {
-        return parent;
-    }
-
-    public GherkinBackground getBackground() {
-        return background;
-    }
-    public void attachBackground(GherkinBackground background) { this.background = background; }
 
     public void setParent(GherkinFeature parent) {
         this.parent = parent;

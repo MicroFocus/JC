@@ -3,7 +3,9 @@ package com.hpe.jc.plugins;
 import com.hpe.jc.JCCannotContinueException;
 import com.hpe.jc.JCPlugin;
 import com.hpe.jc.errors.GherkinAssert;
-import com.hpe.jc.gherkin.*;
+import com.hpe.jc.gherkin.GherkinFeature;
+import com.hpe.jc.gherkin.GherkinScenario;
+import com.hpe.jc.gherkin.GherkinStep;
 import gherkin.lexer.En;
 import gherkin.lexer.Lexer;
 
@@ -13,7 +15,7 @@ import java.util.HashMap;
 /**
  * Created by koreny on 3/31/2017.
  */
-public class JCPValidateFlowBy extends JCPlugin {
+public class JCPFeatureFileValidator extends JCPlugin {
 
     /*********************************
      * Members
@@ -42,11 +44,11 @@ public class JCPValidateFlowBy extends JCPlugin {
      * Constructors
      *********************************/
 
-    protected JCPValidateFlowBy() {
+    protected JCPFeatureFileValidator() {
 
     }
 
-    public JCPValidateFlowBy(String featureFileLocation) {
+    public JCPFeatureFileValidator(String featureFileLocation) {
         this.featureFileLocation = featureFileLocation;
     }
 
@@ -55,23 +57,23 @@ public class JCPValidateFlowBy extends JCPlugin {
      *********************************/
 
     public static GherkinFeature getExpectedFeature(GherkinFeature feature) {
-        return (GherkinFeature)feature.getData(JCPValidateFlowBy.class, EXPECTED_FEATURE);
+        return (GherkinFeature)feature.getData(JCPFeatureFileValidator.class, EXPECTED_FEATURE);
     }
 
     public static String getExpectedScript(GherkinFeature feature) {
-        return (String)feature.getData(JCPValidateFlowBy.class, EXPECTED_SCRIPT);
+        return (String)feature.getData(JCPFeatureFileValidator.class, EXPECTED_SCRIPT);
     }
 
     public static HashMap<GherkinScenario, GherkinScenario> getExpectedToActualScenarioMap(GherkinFeature feature) {
-        return (HashMap<GherkinScenario, GherkinScenario>)feature.getData(JCPValidateFlowBy.class, EXPECTED_TO_ACTUAL_SCENARIO_MAP);
+        return (HashMap<GherkinScenario, GherkinScenario>)feature.getData(JCPFeatureFileValidator.class, EXPECTED_TO_ACTUAL_SCENARIO_MAP);
     }
 
     public static HashMap<GherkinStep, GherkinStep> getExpectedToActualStepMap(GherkinFeature feature) {
-        return (HashMap<GherkinStep, GherkinStep>)feature.getData(JCPValidateFlowBy.class, EXPECTED_TO_ACTUAL_STEP_MAP);
+        return (HashMap<GherkinStep, GherkinStep>)feature.getData(JCPFeatureFileValidator.class, EXPECTED_TO_ACTUAL_STEP_MAP);
     }
 
     public static String getFeatureFileLocation(GherkinFeature feature) {
-        return (String)feature.getData(JCPValidateFlowBy.class, SCRIPT_URL);
+        return (String)feature.getData(JCPFeatureFileValidator.class, SCRIPT_URL);
     }
 
 
@@ -81,7 +83,7 @@ public class JCPValidateFlowBy extends JCPlugin {
 
 
     private static String readGherkinScript(Object testObj, String featureFileLocation) {
-
+        GherkinAssert.featureFileShouldBeFound(testObj, featureFileLocation);
         InputStream stream = testObj.getClass().getResourceAsStream(featureFileLocation);
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";

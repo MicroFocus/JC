@@ -1,16 +1,11 @@
 package com.hpe.jc.gherkin;
 
-import java.util.ArrayList;
-
 /**
  * Created by koreny on 3/20/2017.
+ *
+ *
  */
 public class GherkinBackground extends GherkinScenario{
-
-    // not started, in progress, done, done with errors. Updated by GherkinProgress.
-    //public GherkinElementStatus status = GherkinElementStatus.NOT_STARTED;
-
-    public GherkinScenario parentScenario = null;
 
     public GherkinBackground(String description) {
 
@@ -45,10 +40,10 @@ public class GherkinBackground extends GherkinScenario{
         String code = String.format(
                 "\t@Test\n" +
                 "\tpublic void %s() {\n"+
-                "\t\tjc.background(\"%s\", ()->{\n", toCamelCase(getDescription()), getDescription());
+                "\t\tbackground(\"%s\", ()->{\n", toCamelCase(getDescription()), getDescription());
         for (GherkinStep step : steps) {
             code+= String.format(
-                "\t\t\tjc.%s(\"%s\");\n", step.type.toLowerCase(), step.getDescription());
+                "\t\t\t%s(\"%s\");\n", step.type.toLowerCase(), step.getDescription());
         }
         code += String.format(
                 "\t\t});\n" +

@@ -1,14 +1,14 @@
 package com.hpe.jc.errors;
 
-import com.hpe.jc.gherkin.GherkinBackground;
-import com.hpe.jc.gherkin.GherkinFeature;
 import com.hpe.jc.GherkinProgress;
+import com.hpe.jc.JCCannotContinueException;
+import com.hpe.jc.gherkin.GherkinFeature;
 import com.hpe.jc.gherkin.GherkinScenario;
 import com.hpe.jc.gherkin.GherkinStep;
-import com.hpe.jc.JCCannotContinueException;
 import com.hpe.jc.plugins.Feature;
-import com.hpe.jc.plugins.FeatureFileAt;
 
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,8 +16,6 @@ import java.util.HashMap;
  * Created by koreny on 3/25/2017.
  */
 public class GherkinAssert {
-
-
 
     public enum ERROR_TYPES {
         FEATURE_NOT_DECLARED,
@@ -30,53 +28,40 @@ public class GherkinAssert {
         STEP_MISMATCH,
         LEXER_ERROR,
     }
-//
-//    public static void backgroundTitleShouldBeAsInDefinition(GherkinBackground latestBackground, GherkinBackground expectedbackground) {
-//        if (notTheSame(latestBackground.getDescription(), expectedbackground.getDescription())) {
-//            String message = String.format(
-//                    "Your background title is not as defined in the feature file\n" +
-//                            "Your background title is: \"%s\"\n" +
-//                            "The background defined in the feature file is \"%s\"\n",
-//                    latestBackground.getDescription(),
-//                    expectedbackground.getDescription());
-//
-//            throw createException(message, ERROR_TYPES.BACKGROUND_TITLE_MISMATCH);
-//        }
-//    }
 
-//    public static void shouldBeMatchingNumberOfScenariosToBackgrounds(GherkinProgress progress, int scenarioCounter, int backgroundCounter) {
-//        // total # backgrounds = scenarios + failed background
-//        if (backgroundCounter != scenarioCounter + progress.getCurrentFeature().getNumberOfFailedBackgrounds()) {
-//            String message = String.format(
-//                            "The following scenario ran without running it's background first.\n" +
-//                            "Scenario is:\n\n%s",
-//                    progress.getCurrentScenario().printScenario());
-//
-//            throw createException(message, ERROR_TYPES.BACKGROUND_MISSING);
-//
-//        }
-//    }
+    public static void failedToFoundATestClassWithAnnotation(StackTraceElement[] stack, Class<? extends Annotation> targetAnnotation) {
+        String className;
+        try {
+            className = stack[4].getClassName();
+        } catch (Exception e) {
+            className = "AnyClass";
+        }
+        String message = String.format("\n" +
+                "You need to define the annotation %s on top of your test class\n" +
+                "We could not find it in %s\n" +
+                "This annotation should defines the feature name that this class tests.\n\n" +
+                "Example:\n" +
+                "@Feature(\"The feature title in the feature file\")\n" +
+                "public class %s() {\n" +
+                "}",
+                targetAnnotation.getName(), className, className.substring(className.lastIndexOf(".")+1));
 
-//    public static void backgroundShouldNotHaveBeenAttachedIfNotDefined(GherkinFeature expectedFeature, String script) {
-//        if (!expectedFeature.isBackgroundDefined()) {
-//            String message = String.format(
-//                    "You have used a background in your test code, but your feature file does not have a background defined.\n" +
-//                    "Here is your feature file which does not contain a background definition:\n %s",
-//                    script);
-//            throw createException(message, ERROR_TYPES.BACKGROUND_IS_NOT_EXPECTED);
-//        }
-//    }
+        throw createException(message, ERROR_TYPES.FEATURE_NOT_DECLARED);
+    }
 
-    public static void featureFileAtAnnotationNotFound(FeatureFileAt featureFileAt, Class<?> cls) {
-        if (featureFileAt==null) {
+    public static void featureFileShouldBeFound(Object testObj, String featureFileLocation) {
+        InputStream stream = testObj.getClass().getResourceAsStream(featureFileLocation);
+        if (stream == null) {
             String message = String.format("\n" +
-                    "the class \'%s\' does not contain the \'FeatureFileAt\' annotation. \n" +
-                    "This annotation declares the path to the feature file for authentication of the flow",
-                    cls.getName());
+                    "I could not find a feature file using your path definition \"%s\" \n" +
+                    "as you declared it in \"%s\" in the @FeatureFileAt annotation \n\n" +
+                    "Example: \n"+
+                    "If your feature file is located at \"resources\\features\\MyFeature.feature\" \n" +
+                    "Then you should specify: \"/features/MyFeature.feature\"",
+                    featureFileLocation, testObj.toString());
             throw createException(message, ERROR_TYPES.FEATURE_NOT_DECLARED);
         }
     }
-
 
     public static void featureAnnotationNotFound(Feature feature, Class<?> cls) {
         if (feature==null) {
@@ -87,34 +72,15 @@ public class GherkinAssert {
         }
     }
 
-
     public static void featureTitleShouldBeAsInDefinition(GherkinFeature actual, GherkinFeature expected) {
         if (notTheSame(actual.getDescription(), expected.getDescription())) {
             String message = String.format("\n" +
                     "feature description is not the same as the feature definition file specified. \n" +
-                    "Actual: \"%s\" \n" +
+                    "Actual:   \"%s\" \n" +
                     "Expected: \"%s\" \n", actual.getDescription(), expected.getDescription());
             throw createException(message, ERROR_TYPES.FEATURES_MISMATCH);
         }
     }
-
-//    public static void backgroundStepsNumberShouldBeAsDefined(GherkinScenario expectedBackground, GherkinBackground currentBackground) {
-//        int dif = expectedBackground.steps.size() - currentBackground.steps.size();
-//        if (dif != 0) {
-//            String message = String.format(
-//                    "You seems to have missing %s steps that are defined in your background definition: \n" +
-//                            "your background should be: \n\n%s\n" +
-//                            "But it looks like that: \n\n%s\n",
-//                    String.valueOf(dif),
-//                    expectedBackground.
-//                            printScenario(),
-//                    currentBackground.
-//                            clone(new GherkinStep("X", "")).
-//                            printScenario(String.format("MISSING %d STEPS", dif)));
-//
-//            throw createException(message, ERROR_TYPES.STEP_TOO_FEW_IN_BACKGROUND);
-//        }
-//    }
 
     public static void scenarioStepsNumberShouldBeAsDefined(GherkinScenario expectedScenario, GherkinScenario currentScenario) {
         int dif = expectedScenario.steps.size() - currentScenario.steps.size();
@@ -146,7 +112,7 @@ public class GherkinAssert {
             String message = String.format(
                     "Your scenario description does not match any of the steps on the feature file\n" +
                     "This is your scenario: \n%s\n\n" +
-                    "These are all the steps found in the feature file:\n\n", actualScenario.printScenarioTitle());
+                    "These are all the scenarios found in the feature file:\n\n", actualScenario.printScenarioTitle());
             for (GherkinScenario scenario : featureDefinition.scenarios) {
                 message += scenario.printScenarioTitle() + "\n";
             }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 
 /**
  * Created by koreny on 5/29/2017.
+ *
+ * used by Plugin Manager as a place holder to log exception on init time of plugins...
  */
+
 public class GherkinMock implements IJCExceptionHolder {
 
     ArrayList<Throwable> pluginExArray = new ArrayList<>();
