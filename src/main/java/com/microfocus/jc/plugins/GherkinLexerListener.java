@@ -1,7 +1,6 @@
 package com.microfocus.jc.plugins;
 
 import com.microfocus.jc.gherkin.*;
-import com.microfocus.jc.gherkin.*;
 import gherkin.lexer.Listener;
 import java.util.List;
 

@@ -2,71 +2,63 @@
 
 **Project is still under construction...**
 
-JC is a light weight library for writing cucumber tests without the borden of changing your test structure.
-You write your tests in plain junit, and use JC to describe your scenarios / steps like this:
+###Keep your junit tests. use BDD methodology.
+- JC allows to annotate regular junit tests using Gherkin syntax.  
+- Then, it can optionally validate those annotations against a feature file.  
+
+###JS helps to Integrate with ALM Octane
+- It also creates a report that allows uploading results to ALM Octane as Scenario Tests.
+
+###JC upgrades your error messages
+- JC generates clear error message: it writes all the steps up to the failure so you have context
+- When feature file changes, get a detailed error on which annotation is changed
+
+###JC builds test skeletons from a feature file
+- When you want to automate a new feature file, JS can build the skeleton of all of your tests in a breeze.
+- Just point to the feature file and run -
+- JC will write the whole class with annotations inside the error message 
+
+###JC is extensible 
+- You can create your own plugin that collects information during the run and print report at the end
+
+###Example:
 
 ```java
-// your typical JUnit class
-public class MyCucumberTest {
+@FeatureFileAt("/features/lavaSoft.feature")
+@Feature("My LavaSoft specification and use cases")
+public class MyLavaSoftTests {
 
-    // just add JC to your class
-    public static JC jc = new JC(
-            MyCucumberTest.class, 
-            ".\gherkin.feature", // link to your feature file 
-            "This is your feature file title");
+  // your typical JUnit class with 1 test
 
+  @Test
+  public void test1() {
+    // test is annotated with scenario name and steps description  
+    scenario("First scenario for LavaSoft", () -> {
+      given("I use JC");
+      // automation code here...
 
-    @Test
-    public void test1() {
-        jc.scenario("This is the first scenario", ()->{
-            jc.given( "I use JC");
-            // automation code here...
-            
-            jc.when(children);
-            // automation code here...
+      when("I decorate my tests with given, when, then");
+      // automation code here...
 
-            jc.then("I get a Gherkin report at the end");
-            // automation code here...
-        });
-    }
-
-    @Test
-    public void test2() {
-        jc.scenarioOutline("this will run for each row in the feature file Examples", ()->{
-            jc.given("I make a mistake in the step title named <p1>");
-            // now you can use the parameter as jc["p1"]
-            
-            jc.when("I run the junit test");
-            
-            jc.then(children);
-            
-        });
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        // this will print the gherkin report
-        jc.finished();
-    }
+      then("I get a Gherkin report at the end");
+      // automation code here...
+    });
+  }
+  
+  @AfterClass
+  public static void afterClass() {
+    // need to call finished() to print report at end
+    finished();
+  }
 }
 ```
 
-## You get the following benefits:
-- A test that is easy to read and understand
-
-- Turn your tests into BDD without changing their entire structure
-
-- A validation that your steps/scenarios are identical to the steps/scenarios in the feature file.
-
-- Error messages with context - displays all the steps until the error, so you understand what happend
-
-- Have a feature file without code? 
-  just instantiate the JC class, link it to the feature file and run -> 
-  you will get an error that contains the implementation of the class. Copy. Enjoy.
-  
-- JUnit report describing your Gherkin syntax
-
-- Extensible reporting. You can add other kinds of reports such as HTML.
-
+### How to use
+In your junit file:
+1. Add @FeatureFileAt() annotation to point to the feature file
+2. Add @Feature annotation which describe the feature title
+3. Annotate your tests with scenario, given, when, then as in the example
+4. DON'T FORGET to call to finished() at the end of all tests.   
+   This will generate the report / validation of the feature file structure
 
 
